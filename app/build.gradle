@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -38,6 +39,8 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
 
+    compile project(':todoist-pojos')
+
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile 'io.reactivex:rxjava:1.1.0'
@@ -54,4 +57,6 @@ dependencies {
     testCompile 'com.nhaarman:mockito-kotlin:1.5.0'
     testCompile 'org.jetbrains.spek:spek-api:1.1.0'
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.android.support:support-vector-drawable:26.1.0'
+    implementation 'com.google.android.gms:play-services-plus:11.4.2'
 }

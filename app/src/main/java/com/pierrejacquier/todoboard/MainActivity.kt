@@ -1,33 +1,53 @@
 package com.pierrejacquier.todoboard
 
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
-import com.pierrejacquier.todoboard.features.news.NewsFragment
+import android.view.Menu
+import com.pierrejacquier.todoboard.features.devices.DevicesFragment
+import droidcba.com.kedditbysteps.PlusOneFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        navigation.setOnNavigationItemSelectedListener(onNavItemChange)
 
         if (savedInstanceState == null) {
-            changeFragment(NewsFragment())
+            changeFragment(DevicesFragment())
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private val onNavItemChange = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.navigation_devices -> {
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_store -> {
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+
     fun changeFragment(f: Fragment, cleanStack: Boolean = false) {
-        val ft = supportFragmentManager.beginTransaction();
+        val ft = supportFragmentManager.beginTransaction()
         if (cleanStack) {
             clearBackStack()
         }
         ft.setCustomAnimations(
                 R.anim.abc_fade_in, R.anim.abc_fade_out, R.anim.abc_popup_enter, R.anim.abc_popup_exit)
-        ft.replace(R.id.activity_base_content, f)
+        ft.replace(R.id.fragmentSpace, f)
         ft.addToBackStack(null)
         ft.commit()
     }
