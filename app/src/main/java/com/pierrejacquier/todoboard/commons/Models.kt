@@ -38,7 +38,7 @@ data class RedditNewsItem(
         val thumbnail: String,
         val url: String
 ) : ViewType, Parcelable {
-    override fun getViewType() = AdapterConstants.NEWS
+    override fun getViewType() = AdapterConstants.BOARD
 
     constructor(source: Parcel) : this(
             source.readString(),

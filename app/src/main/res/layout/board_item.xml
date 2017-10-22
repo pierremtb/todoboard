@@ -1,0 +1,40 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="board" type="com.pierrejacquier.todoboard.database.boards.Board"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/material_component_cards_space_between_cards"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="@dimen/material_layout_keylines_screen_edge_margin"
+            android:layout_marginLeft="@dimen/material_layout_keylines_screen_edge_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/material_layout_keylines_screen_edge_margin"
+            android:layout_marginRight="@dimen/material_layout_keylines_screen_edge_margin">
+
+            <TextView
+                android:id="@+id/boardName"
+                android:textColor="@color/colorPrimaryText"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/material_component_cards_primary_title_top_padding"
+                android:padding="@dimen/material_component_cards_top_and_bottom_padding"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/material_typography_headline"
+                android:text="@{board.name}" />
+
+        </android.support.v7.widget.CardView>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -1,13 +1,13 @@
 package com.pierrejacquier.todoboard
 
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
-import com.pierrejacquier.todoboard.features.devices.DevicesFragment
-import droidcba.com.kedditbysteps.PlusOneFragment
+import android.view.MenuItem
+import com.pierrejacquier.todoboard.commons.consume
+import com.pierrejacquier.todoboard.features.boards.BoardsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,10 +16,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        navigation.setOnNavigationItemSelectedListener(onNavItemChange)
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         if (savedInstanceState == null) {
-            changeFragment(DevicesFragment())
+            changeFragment(BoardsFragment())
         }
     }
 
@@ -28,31 +28,23 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private val onNavItemChange = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_devices -> {
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_store -> {
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when(item!!.itemId) {
+        R.id.action_settings -> consume { startActivity(SettingsIntent()) }
+        else -> false
     }
 
-    fun changeFragment(f: Fragment, cleanStack: Boolean = false) {
+    private fun changeFragment(f: Fragment, cleanStack: Boolean = false) {
         val ft = supportFragmentManager.beginTransaction()
         if (cleanStack) {
             clearBackStack()
         }
-        ft.setCustomAnimations(
-                R.anim.abc_fade_in, R.anim.abc_fade_out, R.anim.abc_popup_enter, R.anim.abc_popup_exit)
+        ft.setCustomAnimations(R.anim.slide_in_up, 0)
         ft.replace(R.id.fragmentSpace, f)
         ft.addToBackStack(null)
         ft.commit()
     }
 
-    fun clearBackStack() {
+    private fun clearBackStack() {
         val manager = supportFragmentManager
         if (manager.backStackEntryCount > 0) {
             val first = manager.getBackStackEntryAt(0)

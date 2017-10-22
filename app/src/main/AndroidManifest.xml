@@ -26,6 +26,33 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".BoardActivity"
+            android:label="@string/title_activity_board"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".BoardSetupActivity"
+            android:label="@string/title_activity_board_setup"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="todoist"
+                    android:scheme="com.pierrejacquier.todoboard" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

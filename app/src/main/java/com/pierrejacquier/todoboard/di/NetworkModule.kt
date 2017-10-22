@@ -12,7 +12,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit() = Retrofit.Builder()
-            .baseUrl("https://www.reddit.com")
+            .baseUrl("https://todoist.com/api/v7/sync/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
 }
