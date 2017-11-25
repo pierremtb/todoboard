@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pierrejacquier.todoboard.features.setup.steps.ProviderAuthStepFragment">
+    tools:context="com.pierrejacquier.todoboard.oldfeat.setup.steps.ProviderAuthStepFragment">
 
     <TextView
         android:id="@+id/title"
@@ -12,13 +12,28 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
+        android:fontFamily="@font/quicksand_medium"
         android:text="@string/tune"
-        android:textColor="@color/colorPrimaryText"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textColor="@color/colorPrimaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/projectsRV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        tools:layout_editor_absoluteY="9dp" />
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        tools:listitem="@layout/project_checkbox_item" />
+
 
 </android.support.constraint.ConstraintLayout>

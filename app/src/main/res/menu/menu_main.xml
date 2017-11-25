@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.pierrejacquier.todoboard.MainActivity">
+    tools:context=".screens.main.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_about"
         android:orderInCategory="100"
-        android:title="@string/settings"
-        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/about"
+        android:icon="@drawable/ic_info_outline"
         app:showAsAction="ifRoom" />
 </menu>

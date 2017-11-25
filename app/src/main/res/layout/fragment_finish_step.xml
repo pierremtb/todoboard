@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pierrejacquier.todoboard.features.setup.steps.ProviderAuthStepFragment">
+    tools:context="com.pierrejacquier.todoboard.oldfeat.setup.steps.ProviderAuthStepFragment">
 
     <TextView
         android:id="@+id/title"
@@ -13,6 +13,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:text="@string/finish"
+        android:fontFamily="@font/quicksand_medium"
         android:textColor="@color/colorPrimaryText"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,5 +21,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         tools:layout_editor_absoluteY="9dp" />
+
+    <EditText
+        android:id="@+id/newBoardNameEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:inputType="textCapWords"
+        android:hint="@string/name_your_board"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
 
 </android.support.constraint.ConstraintLayout>

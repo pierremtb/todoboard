@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".screens.main.MainActivity">
+
+    <data>
+        <variable
+            name="board"
+            type="com.pierrejacquier.todoboard.data.model.Board" />
+        <variable
+            name="user"
+            type="com.pierrejacquier.todoboard.data.model.todoist.User" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey50">
+
+        <FrameLayout
+            android:id="@+id/titleLayout"
+            android:layout_width="match_parent"
+            android:layout_height="98dp"
+            android:background="@color/grey900"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:focusableInTouchMode="true"
+            app:layout_constraintStart_toStartOf="parent"
+            style="@style/ThemeOverlay.AppCompat.Dark"
+            app:layout_constraintTop_toBottomOf="@+id/boardToolbar">
+
+            <EditText
+                android:id="@+id/boardTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="92dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="92dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:ems="10"
+                android:fontFamily="@font/quicksand_medium"
+                android:inputType="textPersonName"
+                android:text="@={board.name}"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
+
+        </FrameLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/boardToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/grey900"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            app:title=""
+            app:titleTextColor="@color/white"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/launchBoardFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="68dp"
+            android:clickable="true"
+            app:fabSize="normal"
+            app:layout_constraintEnd_toEndOf="@+id/titleLayout"
+            app:layout_constraintTop_toTopOf="@+id/titleLayout"
+            app:srcCompat="@drawable/ic_tv" />
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleLayout">
+
+            <LinearLayout
+                android:id="@+id/detailsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingBottom="20dp"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/todoist_user"
+                        android:textSize="14sp" />
+                </FrameLayout>
+
+                <com.pierrejacquier.todoboard.commons.ListItemViewJava
+                    android:id="@+id/userListItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:liv_displayMode="avatar"
+                    app:liv_multiline="false"
+                    bind:subtitle="@{user.email}"
+                    bind:title="@{user.fullName}" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/selected_projects"
+                        android:textSize="14sp" />
+                </FrameLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/selectedProjectsRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/project_item" />
+
+                <View
+                    android:id="@+id/colored_bar"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="@dimen/liv_keyline"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_height="1dp"
+                    android:background="@color/colorDivider" />
+
+                <com.pierrejacquier.todoboard.commons.ListItemViewJava
+                    android:id="@+id/manageProjectsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:liv_displayMode="circularIcon"
+                    app:liv_icon="@drawable/ic_build"
+                    app:liv_multiline="false"
+                    app:liv_title="@string/manage_selected_projects"/>
+
+
+            </LinearLayout>
+        </ScrollView>
+        
+
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

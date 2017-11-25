@@ -1,7 +1,7 @@
 //package com.pierrejacquier.todoboard
 //
 //import com.nhaarman.mockito_kotlin.*
-//import com.pierrejacquier.todoboard.api.*
+//import com.pierrejacquier.todoboard.data.api.*
 //import com.pierrejacquier.todoboard.commons.RedditNews
 //import com.pierrejacquier.todoboard.features.news.NewsManager
 //import okhttp3.MediaType

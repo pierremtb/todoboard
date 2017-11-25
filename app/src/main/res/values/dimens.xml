@@ -7,4 +7,7 @@
     <dimen name="secondaryOpacity">0.54</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="item_height">28dp</dimen>
+    <dimen name="items_top">28dp</dimen>
 </resources>

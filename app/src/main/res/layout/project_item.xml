@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="project"
+            type="com.pierrejacquier.todoboard.data.model.todoist.Project" />
+    </data>
+
+    <com.pierrejacquier.todoboard.commons.ListItemViewJava
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:liv_icon="@drawable/ic_label"
+        app:liv_displayMode="circularIcon"
+        bind:title="@{project.name}"
+        bind:circularIconColor="@{project.getIntColor()}" />
+</layout>
