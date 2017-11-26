@@ -2,6 +2,7 @@ package com.pierrejacquier.todoboard.screens.main.fragments.boards
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +10,15 @@ import com.pierrejacquier.todoboard.*
 import com.pierrejacquier.todoboard.screens.details.BoardDetailsIntent
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.inflate
+import com.pierrejacquier.todoboard.commons.extensions.toDp
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_boards.*
+import kotlinx.android.synthetic.main.main_fragment_boards.*
 import javax.inject.Inject
 import com.pierrejacquier.todoboard.screens.board.BoardIntent
+import com.pierrejacquier.todoboard.screens.main.MainActivity
 import com.pierrejacquier.todoboard.screens.main.adapters.BoardsAdapter
 import com.pierrejacquier.todoboard.screens.main.fragments.boards.di.DaggerBoardsListFragmentComponent
 import com.pierrejacquier.todoboard.screens.setup.DisplaySetupIntent
@@ -42,7 +45,7 @@ class BoardsListFragment : RxBaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return container?.inflate(R.layout.fragment_boards)
+        return container?.inflate(R.layout.main_fragment_boards)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -62,6 +65,14 @@ class BoardsListFragment : RxBaseFragment() {
                 activity?.startActivity(activity?.BoardIntent(board))
                 }
             }
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                        (activity as MainActivity)?.let {
+                            it.supportActionBar?.elevation = (if (dy == 0) 0 else 4).toDp(context).toFloat()
+                    }
+                }
+            })
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_BOARDS)) {

@@ -8,7 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.commons.consume
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.main_activity.*
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.pierrejacquier.todoboard.screens.main.fragments.boards.BoardsListFragment
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.main_activity)
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowTitleEnabled(false)
 

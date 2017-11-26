@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.data.model.Board
-import com.pierrejacquier.todoboard.databinding.BoardItemBinding
-import kotlinx.android.synthetic.main.board_item.view.*
+import com.pierrejacquier.todoboard.databinding.MainBoardItemBinding
+import kotlinx.android.synthetic.main.main_board_item.view.*
 import kotlin.properties.Delegates
 
 class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdatableAdapter {
@@ -20,7 +20,7 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(
-                    BoardItemBinding.inflate(
+                    MainBoardItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent, false
                     )
@@ -39,7 +39,7 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
         }
     }
 
-    class ViewHolder(private val binding: BoardItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: MainBoardItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Board) = with(binding) {
             board = item

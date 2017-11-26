@@ -58,7 +58,7 @@
         app:layout_constraintTop_toTopOf="@id/separator">
 
         <FrameLayout
-            tools:layout="@layout/fragment_items_block"
+            tools:layout="@layout/board_fragment_items_block"
             android:id="@+id/firstItemsLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -66,7 +66,7 @@
             app:layout_constraintHeight_percent="0.33"/>
 
         <FrameLayout
-            tools:layout="@layout/fragment_items_block"
+            tools:layout="@layout/board_fragment_items_block"
             android:id="@+id/secondItemsLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -75,7 +75,7 @@
             app:layout_constraintHeight_percent="0.33"/>
 
         <FrameLayout
-            tools:layout="@layout/fragment_items_block"
+            tools:layout="@layout/board_fragment_items_block"
             android:id="@+id/thirdItemsLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"

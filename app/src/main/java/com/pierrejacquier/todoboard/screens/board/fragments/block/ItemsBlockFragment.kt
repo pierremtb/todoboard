@@ -1,6 +1,7 @@
 package com.pierrejacquier.todoboard.screens.board.fragments.block
 
 import android.os.Bundle
+import android.support.annotation.MainThread
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,7 @@ import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.todoist.Item
-import com.pierrejacquier.todoboard.databinding.FragmentHeaderBinding
-import com.pierrejacquier.todoboard.databinding.FragmentItemsBlockBinding
+import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
 import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
 import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
@@ -21,8 +21,8 @@ import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHead
 import e
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_boards.*
-import kotlinx.android.synthetic.main.fragment_items_block.*
+import kotlinx.android.synthetic.main.main_fragment_boards.*
+import kotlinx.android.synthetic.main.board_fragment_items_block.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -40,7 +40,7 @@ class ItemsBlockFragment : RxBaseFragment() {
         val TITLES = arrayOf("Today", "Tomorrow", "Later", "Undated")
     }
 
-    lateinit var binding: FragmentItemsBlockBinding
+    lateinit var binding: BoardFragmentItemsBlockBinding
 
     var type = 0
 
@@ -67,7 +67,7 @@ class ItemsBlockFragment : RxBaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentItemsBlockBinding.inflate(inflater, container, false)
+        binding = BoardFragmentItemsBlockBinding.inflate(inflater, container, false)
         binding.title = TITLES[type]
         return binding.root
     }
@@ -82,15 +82,13 @@ class ItemsBlockFragment : RxBaseFragment() {
         }
 
         val itemsSub = itemsManager.getItemsObservable(type)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { newItems ->
-                    activity?.runOnUiThread {
-                        items = newItems
-                        e { "////// ${TITLES[type]} "}
-                        e { newItems.map { it.content }.toString() }
-                        e { "////// end" }
-                    }
+                    items = newItems
+                    e { "////// ${TITLES[type]} "}
+                    e { newItems.map { it.content }.toString() }
+                    e { "////// end" }
                 }
 
         subscriptions.add(itemsSub)

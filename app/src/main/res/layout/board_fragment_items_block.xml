@@ -43,7 +43,7 @@
                 android:id="@+id/itemsRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/task_item" />
+                tools:listitem="@layout/board_task_item" />
         </ScrollView>
 
     </android.support.constraint.ConstraintLayout>

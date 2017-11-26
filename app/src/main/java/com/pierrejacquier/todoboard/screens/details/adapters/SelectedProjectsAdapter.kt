@@ -8,7 +8,7 @@ import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.inflate
 import com.pierrejacquier.todoboard.data.model.todoist.Project
-import com.pierrejacquier.todoboard.databinding.ProjectItemBinding
+import com.pierrejacquier.todoboard.databinding.DetailsProjectItemBinding
 import kotlin.properties.Delegates
 
 class SelectedProjectsAdapter() : RecyclerView.Adapter<SelectedProjectsAdapter.ViewHolder>(), AutoUpdatableAdapter {
@@ -20,7 +20,7 @@ class SelectedProjectsAdapter() : RecyclerView.Adapter<SelectedProjectsAdapter.V
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(
-                    ProjectItemBinding.inflate(
+                    DetailsProjectItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent, false
                     )
@@ -32,7 +32,7 @@ class SelectedProjectsAdapter() : RecyclerView.Adapter<SelectedProjectsAdapter.V
         holder.bind(items[position])
     }
 
-    class ViewHolder(private val binding: ProjectItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: DetailsProjectItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Project) = with(binding) {
             project = item

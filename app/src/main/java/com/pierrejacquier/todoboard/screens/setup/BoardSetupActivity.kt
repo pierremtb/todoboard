@@ -1,23 +1,16 @@
 package com.pierrejacquier.todoboard.screens.setup
 
-import agency.tango.android.avatarview.loader.PicassoLoader
 import android.content.Context
 import android.content.Intent
-import android.databinding.ObservableArrayList
-import android.databinding.ObservableList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcel
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_board_setup.*
+import kotlinx.android.synthetic.main.setup_activity.*
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.pierrejacquier.todoboard.BR
-import com.pierrejacquier.todoboard.BuildConfig
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.PicassoCustomLoader
@@ -29,20 +22,18 @@ import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.data.model.todoist.User
-import com.pierrejacquier.todoboard.databinding.ProjectCheckboxItemBinding
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectableProjectsAdapter
 import com.pierrejacquier.todoboard.screens.setup.di.DaggerBoardSetupActivityComponent
 import com.squareup.picasso.Picasso
 import com.stepstone.stepper.StepperLayout
 import com.stepstone.stepper.VerificationError
 import e
-import i
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_finish_step.*
-import kotlinx.android.synthetic.main.fragment_provider_auth_step.*
-import kotlinx.android.synthetic.main.fragment_provider_details_step.*
+import kotlinx.android.synthetic.main.setup_fragment_finish_step.*
+import kotlinx.android.synthetic.main.setup_fragment_provider_auth_step.*
+import kotlinx.android.synthetic.main.setup_fragment_provider_details_step.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -94,7 +85,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_board_setup)
+        setContentView(R.layout.setup_activity)
         DaggerBoardSetupActivityComponent.builder()
                 .todoboardAppComponent(TodoboardApp.withActivity(this).component)
                 .build()
@@ -232,6 +223,8 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
 
     fun syncData() {
         val syncSub = syncService.sync(Board(0, newBoardName, newBoardAccessToken), true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ board ->
                     newBoardUserId = board.userId
                     newBoardSyncToken = board.syncToken
@@ -243,11 +236,11 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
 
     fun findUser() {
         val userSub = database.usersDao().findUser(newBoardUserId)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({ user ->
                     newBoardUser = user
-                    this.runOnUiThread { displayUser() }
+                    displayUser()
                 })
         subscriptions.add(userSub)
     }

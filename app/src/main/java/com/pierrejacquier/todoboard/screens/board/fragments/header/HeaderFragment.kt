@@ -11,7 +11,7 @@ import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.todoist.User
-import com.pierrejacquier.todoboard.databinding.FragmentHeaderBinding
+import com.pierrejacquier.todoboard.databinding.BoardFragmentHeaderBinding
 import com.pierrejacquier.todoboard.screens.board.BoardIntent
 import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHeaderFragmentComponent
 import com.pierrejacquier.todoboard.screens.main.adapters.BoardsAdapter
@@ -31,7 +31,7 @@ class HeaderFragment : RxBaseFragment() {
     @Inject
     lateinit var database: AppDatabase
 
-    lateinit var binding: FragmentHeaderBinding
+    lateinit var binding: BoardFragmentHeaderBinding
     lateinit var userName: String
 
 
@@ -49,7 +49,7 @@ class HeaderFragment : RxBaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentHeaderBinding.inflate(inflater, container, false)
+        binding = BoardFragmentHeaderBinding.inflate(inflater, container, false)
         binding.userName = userName
         binding.date = SimpleDateFormat("EEE, MMM d", Locale.US).format(Date())
         return binding.root

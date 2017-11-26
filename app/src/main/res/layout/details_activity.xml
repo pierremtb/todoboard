@@ -137,7 +137,7 @@
                     android:id="@+id/selectedProjectsRV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:listitem="@layout/project_item" />
+                    tools:listitem="@layout/details_project_item" />
 
                 <View
                     android:id="@+id/colored_bar"

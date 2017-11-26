@@ -21,7 +21,7 @@ import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.data.model.todoist.User
-import com.pierrejacquier.todoboard.databinding.ActivityBoardDetailsBinding
+import com.pierrejacquier.todoboard.databinding.DetailsActivityBinding
 import com.pierrejacquier.todoboard.screens.board.BoardIntent
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectableProjectsAdapter
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectedProjectsAdapter
@@ -30,10 +30,9 @@ import com.pierrejacquier.todoboard.screens.main.MainActivity
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_board_details.*
+import kotlinx.android.synthetic.main.details_activity.*
 import javax.inject.Inject
 import com.squareup.picasso.Picasso
-import e
 
 
 fun Context.BoardDetailsIntent(board: Board?): Intent {
@@ -77,7 +76,7 @@ class BoardDetailsActivity : RxBaseActivity() {
     @Inject
     lateinit var syncService: SyncService
 
-    lateinit var binding: ActivityBoardDetailsBinding
+    lateinit var binding: DetailsActivityBinding
 
     lateinit private var projectsDialog: MaterialDialog
 
@@ -85,7 +84,7 @@ class BoardDetailsActivity : RxBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_board_details)
+        binding = DataBindingUtil.setContentView(this, R.layout.details_activity)
 
         setSupportActionBar(boardToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -112,7 +111,7 @@ class BoardDetailsActivity : RxBaseActivity() {
 
         projectsDialog = MaterialDialog.Builder(this)
                 .title(R.string.manage_selected_projects)
-                .customView(R.layout.manage_projects, true)
+                .customView(R.layout.details_manage_projects, true)
                 .positiveText(R.string.done)
                 .positiveColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .onPositive { dialog, _ ->

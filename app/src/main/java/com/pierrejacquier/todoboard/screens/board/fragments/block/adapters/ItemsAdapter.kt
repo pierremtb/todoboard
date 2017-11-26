@@ -8,8 +8,7 @@ import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.data.model.todoist.Project
-import com.pierrejacquier.todoboard.databinding.ProjectItemBinding
-import com.pierrejacquier.todoboard.databinding.TaskItemBinding
+import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
 import kotlin.properties.Delegates
 
 class ItemsAdapter() : RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
@@ -20,7 +19,7 @@ class ItemsAdapter() : RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpda
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(
-                    TaskItemBinding.inflate(
+                    BoardTaskItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent, false
                     )
@@ -32,7 +31,7 @@ class ItemsAdapter() : RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpda
         holder.bind(items[position])
     }
 
-    class ViewHolder(private val binding: TaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: BoardTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Item) = with(binding) {
             task = item

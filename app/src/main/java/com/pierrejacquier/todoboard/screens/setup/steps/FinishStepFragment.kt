@@ -23,6 +23,6 @@ class FinishStepFragment : Fragment(), Step {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return container?.inflate(R.layout.fragment_finish_step)
+        return container?.inflate(R.layout.setup_fragment_finish_step)
     }
 }

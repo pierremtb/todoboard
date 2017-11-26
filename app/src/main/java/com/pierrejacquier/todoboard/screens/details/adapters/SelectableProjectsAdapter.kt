@@ -5,8 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.data.model.todoist.Project
-import com.pierrejacquier.todoboard.databinding.ProjectCheckboxItemBinding
-import com.pierrejacquier.todoboard.databinding.ProjectItemBinding
+import com.pierrejacquier.todoboard.databinding.SetupProjectCheckboxItemBinding
 import kotlin.properties.Delegates
 
 class SelectableProjectsAdapter() : RecyclerView.Adapter<SelectableProjectsAdapter.ViewHolder>(), AutoUpdatableAdapter {
@@ -17,7 +16,7 @@ class SelectableProjectsAdapter() : RecyclerView.Adapter<SelectableProjectsAdapt
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(
-                    ProjectCheckboxItemBinding.inflate(
+                    SetupProjectCheckboxItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent, false
                     )
@@ -29,7 +28,7 @@ class SelectableProjectsAdapter() : RecyclerView.Adapter<SelectableProjectsAdapt
         holder.bind(items[position])
     }
 
-    class ViewHolder(private val binding: ProjectCheckboxItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: SetupProjectCheckboxItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Project) = with(binding) {
             project = item

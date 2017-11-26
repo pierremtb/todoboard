@@ -1,9 +1,7 @@
 package com.pierrejacquier.todoboard.screens.board
 
-import android.app.Fragment
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
@@ -11,26 +9,19 @@ import android.view.View
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseActivity
-import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.api.SyncService
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
-import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.data.model.todoist.Project
-import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.di.DaggerBoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.block.ItemsBlockFragment
-import com.pierrejacquier.todoboard.screens.board.fragments.block.adapters.ItemsAdapter
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment
-import com.pierrejacquier.todoboard.screens.details.di.DaggerBoardDetailsActivityComponent
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import e
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_board.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_items_block.*
+import kotlinx.android.synthetic.main.board_activity.*
 import javax.inject.Inject
 
 fun Context.BoardIntent(board: Board?): Intent {
@@ -104,7 +95,7 @@ class BoardActivity : RxBaseActivity() {
                 .build()
         component.inject(this)
 
-        setContentView(R.layout.activity_board)
+        setContentView(R.layout.board_activity)
         setSupportActionBar(hideableToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -119,8 +110,8 @@ class BoardActivity : RxBaseActivity() {
         showItemsFragment(ItemsBlockFragment.UNDATED, R.id.thirdItemsLayout, UNDATED_FRAGMENT)
 
         val syncSub = syncService.sync(board)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { newBoard -> board = newBoard }
 
         subscriptions.add(syncSub)

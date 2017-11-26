@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.data.model.todoist.Item
-import com.pierrejacquier.todoboard.databinding.ProjectItemBinding
 import e
 import khronos.toString
 import java.text.SimpleDateFormat

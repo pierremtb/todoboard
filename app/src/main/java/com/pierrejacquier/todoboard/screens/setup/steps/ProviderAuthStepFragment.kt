@@ -11,7 +11,7 @@ import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.commons.extensions.inflate
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import kotlinx.android.synthetic.main.fragment_provider_auth_step.*
+import kotlinx.android.synthetic.main.setup_fragment_provider_auth_step.*
 
 class ProviderAuthStepFragment : Fragment(), Step {
 
@@ -29,7 +29,7 @@ class ProviderAuthStepFragment : Fragment(), Step {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return container?.inflate(R.layout.fragment_provider_auth_step)
+        return container?.inflate(R.layout.setup_fragment_provider_auth_step)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
