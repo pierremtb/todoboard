@@ -9,9 +9,8 @@ data class Item(
         @PrimaryKey(autoGenerate = false)
         @Json(name = "id") val id: Long?, //2391052307
 
-        var boardId: Long = 0,
-
         @Json(name = "user_id") val userId: Long?, //7833481
+        @Json(name = "project_id") val projectId: Long?, //2156294426
 
         @Json(name = "day_order") val dayOrder: Int?, //1
         @Json(name = "assigned_by_uid") val assignedByUid: String?, //null
@@ -31,7 +30,6 @@ data class Item(
         @Json(name = "item_order") val itemOrder: Int?, //9
         @Json(name = "is_deleted") val isDeleted: Int, //0
         @Json(name = "responsible_uid") val responsibleUid: String?, //null
-        @Json(name = "project_id") val projectId: Long?, //2156294426
         @Json(name = "collapsed") val collapsed: Int?, //0
         @Json(name = "date_string") val dateString: String? //every day at 10:15pm
 )

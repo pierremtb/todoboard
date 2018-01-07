@@ -13,6 +13,7 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/itemRoot"
         android:layout_width="match_parent"
         android:layout_height="28dp"
         android:background="#000">
@@ -33,26 +34,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:ellipsize="end"
             android:fontFamily="@font/quicksand_medium"
+            android:maxLines="1"
             android:text="@{task.content}"
             android:textColor="@color/white"
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/circle"
             app:layout_constraintStart_toEndOf="@id/circle"
-            app:layout_constraintTop_toTopOf="parent"
-            bind:text="Do this and that" />
+            app:layout_constraintTop_toTopOf="@+id/circle"
+            app:layout_constraintVertical_bias="0.59000003"
+            bind:text="Do this and " />
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:layout_marginStart="8dp"
             android:fontFamily="@font/quicksand_medium"
             android:text="@{dueTime}"
             android:textColor="@color/secondaryWhite"
             android:textSize="12sp"
-            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/textView"
             bind:text="4 pm" />
 

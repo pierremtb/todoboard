@@ -47,6 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/headerLayout" />
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/blocksWrapper"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -59,29 +60,52 @@
 
         <FrameLayout
             tools:layout="@layout/board_fragment_items_block"
-            android:id="@+id/firstItemsLayout"
+            android:id="@+id/overdueItemsLayout"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.33"/>
+            app:layout_constraintHeight_percent="0.2"/>
 
         <FrameLayout
             tools:layout="@layout/board_fragment_items_block"
-            android:id="@+id/secondItemsLayout"
+            android:id="@+id/todayItemsLayout"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/firstItemsLayout"
+            app:layout_constraintTop_toBottomOf="@id/overdueItemsLayout"
             app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.33"/>
+            app:layout_constraintHeight_percent="0.2"/>
 
         <FrameLayout
             tools:layout="@layout/board_fragment_items_block"
-            android:id="@+id/thirdItemsLayout"
+            android:id="@+id/tomorrowItemsLayout"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/secondItemsLayout"
+            app:layout_constraintTop_toBottomOf="@id/todayItemsLayout"
             app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.33"/>
+            app:layout_constraintHeight_percent="0.2"/>
+
+        <FrameLayout
+            tools:layout="@layout/board_fragment_items_block"
+            android:id="@+id/laterItemsLayout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/tomorrowItemsLayout"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintHeight_percent="0.2"/>
+
+        <FrameLayout
+            tools:layout="@layout/board_fragment_items_block"
+            android:id="@+id/undatedItemsLayout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/laterItemsLayout"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintHeight_percent="0.2"/>
 
 
     </android.support.constraint.ConstraintLayout>

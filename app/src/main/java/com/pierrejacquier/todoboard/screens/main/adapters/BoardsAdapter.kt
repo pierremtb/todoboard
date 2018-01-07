@@ -5,15 +5,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.data.model.Board
+import com.pierrejacquier.todoboard.data.model.BoardExtendedWithProjects
+import com.pierrejacquier.todoboard.data.model.todoist.Project
+import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.databinding.MainBoardItemBinding
 import kotlinx.android.synthetic.main.main_board_item.view.*
 import kotlin.properties.Delegates
 
 class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdatableAdapter {
 
-    var items: List<Board> by Delegates.observable(emptyList()) { _, old, new ->
-        autoNotify(old, new) { o, n -> o.id == n.id }
+    var items: List<BoardExtendedWithProjects> by Delegates.observable(emptyList()) { _, old, new ->
+        autoNotify(old, new) { o, n -> o.board?.id == n.board?.id }
     }
+
+    var projects: List<List<Project>> = emptyList()
 
     lateinit var onConfigureClick: (Board) -> Unit
     lateinit var onLaunchClick: (Board) -> Unit
@@ -30,19 +35,31 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item)
 
-        with (holder.itemView) {
-            holder.itemView.boardCard.setOnClickListener { onLaunchClick(item) }
-            holder.itemView.launchBoardButton.setOnClickListener { onLaunchClick(item) }
-            holder.itemView.configureBoardButton.setOnClickListener { onConfigureClick(item) }
+        item.board?.let {
+            holder.bind(
+                    it,
+                    item.user.getOrNull(0),
+                    item.projectsJoins.mapNotNull { it.project.getOrNull(0) }.sortedBy { it.itemOrder }
+            )
+
+            with (holder.itemView) {
+                holder.itemView.boardCard.setOnClickListener { onLaunchClick(item.board!!) }
+                holder.itemView.launchBoardButton.setOnClickListener { onLaunchClick(item.board!!) }
+                holder.itemView.configureBoardButton.setOnClickListener { onConfigureClick(item.board!!) }
+            }
         }
+
     }
 
     class ViewHolder(private val binding: MainBoardItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Board) = with(binding) {
-            board = item
+        fun bind(currentBoard: Board, currentUser: User?, projects: List<Project>) = with(binding) {
+            board = currentBoard
+            user = currentUser
+            firstProjects = projects.take(5).toList()
+            projectsCount = "${projects.size} projects"
+
             executePendingBindings()
         }
     }

@@ -19,12 +19,12 @@ import com.pierrejacquier.todoboard.commons.extensions.snack
 import com.pierrejacquier.todoboard.data.api.SyncService
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
+import com.pierrejacquier.todoboard.data.model.BoardProjectJoin
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.databinding.DetailsActivityBinding
 import com.pierrejacquier.todoboard.screens.board.BoardIntent
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectableProjectsAdapter
-import com.pierrejacquier.todoboard.screens.details.adapters.SelectedProjectsAdapter
 import com.pierrejacquier.todoboard.screens.details.di.DaggerBoardDetailsActivityComponent
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import io.reactivex.Observable
@@ -33,6 +33,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.details_activity.*
 import javax.inject.Inject
 import com.squareup.picasso.Picasso
+import kotlin.properties.Delegates
 
 
 fun Context.BoardDetailsIntent(board: Board?): Intent {
@@ -52,20 +53,15 @@ class BoardDetailsActivity : RxBaseActivity() {
 
     lateinit private var board: Board
     lateinit var user: User
+    private var projectsJoins: List<BoardProjectJoin> by Delegates.observable(emptyList()) { _, old, new ->
+        updateBoardProjects(old, new)
+    }
 
-    var selectedProjects: List<Project>
-        get() = with(selectedProjectsRV.adapter as SelectedProjectsAdapter) { return items }
-        set(newItems) {
-            with(selectedProjectsRV.adapter as SelectedProjectsAdapter) { items = newItems }
-        }
-
-    var selectableProjects: List<Project>
+    private var selectableProjects: List<Project>
         get() = with(selectableProjectsRV.adapter as SelectableProjectsAdapter) { return items }
         set(newItems) {
             with(selectableProjectsRV.adapter as SelectableProjectsAdapter) { items = newItems }
         }
-
-    private var projects = ArrayList<Project>()
 
     @Inject
     lateinit var database: AppDatabase
@@ -91,6 +87,7 @@ class BoardDetailsActivity : RxBaseActivity() {
         supportActionBar?.title = ""
 
         board = intent.extras.getParcelable(BOARD_DETAILS_KEY)
+
         binding.board = board
 
         DaggerBoardDetailsActivityComponent.builder()
@@ -100,14 +97,11 @@ class BoardDetailsActivity : RxBaseActivity() {
 
         loadAdditionalData()
 
-        launchBoardFab.setOnClickListener { _ -> startActivity(BoardIntent(board)) }
-
-
-        selectedProjectsRV.apply {
-            setHasFixedSize(false)
-            layoutManager = LinearLayoutManager(context)
-            adapter = SelectedProjectsAdapter()
+        launchBoardFab.setOnClickListener { _ ->
+            updateBoard()
+            startActivity(BoardIntent(board))
         }
+
 
         projectsDialog = MaterialDialog.Builder(this)
                 .title(R.string.manage_selected_projects)
@@ -115,9 +109,15 @@ class BoardDetailsActivity : RxBaseActivity() {
                 .positiveText(R.string.done)
                 .positiveColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .onPositive { dialog, _ ->
-                    selectedProjects = selectableProjects.filter { it.selected }
-                    dialog.hide()
+                    val newProjectsJoins = ArrayList<BoardProjectJoin>()
+                    selectableProjects.forEach {
+                        if (it.selected && it.id != null) {
+                            newProjectsJoins.add(BoardProjectJoin(id = 0, boardId = board.id, projectId = it.id!!))
+                        }
+                    }
+                    projectsJoins = newProjectsJoins
                     updateProjects()
+                    dialog.hide()
                 }
                 .build()
 
@@ -179,24 +179,25 @@ class BoardDetailsActivity : RxBaseActivity() {
     }
 
     private fun loadUser() {
-        val userSub = database.usersDao().findUser(board.userId)
+        val userSub = database.boardsDao().findBoardExtended(board.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    user = it
+                .subscribe({
+                    user = it.user[0]
+                    projectsJoins = it.projectsJoins
                     loadProjects()
-                }
+                }, {})
         subscriptions.add(userSub)
     }
 
     private fun loadProjects() {
-        val projectsSub = database.projectsDao().findBoardProjects(board.id)
+        val projectsSub = database.projectsDao().findUserProjects(user.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { retrievedProjects ->
-                    selectableProjects = retrievedProjects
-                    selectedProjects = selectableProjects.filter { it.selected }
-                    showAdditionalData()
+                .subscribe {
+                    val projectsIds = projectsJoins.map { it.projectId }
+                    selectableProjects = it.map { it.selected = projectsIds.contains(it.id); it }.sortedBy { it.itemOrder }
+                    updateProjects()
                 }
         subscriptions.add(projectsSub)
     }
@@ -213,15 +214,21 @@ class BoardDetailsActivity : RxBaseActivity() {
     }
 
     private fun updateProjects() {
-        val projectsSub = Observable.fromCallable { database.projectsDao().updateProjects(selectableProjects) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-        subscriptions.add(projectsSub)
+        val projectsIds = projectsJoins.map { it.projectId }
+        binding.selectedProjects = selectableProjects.filter {projectsIds.contains(it.id) }
+        showAdditionalData()
     }
 
     private fun updateBoard() {
         val boardSub = Observable.fromCallable { database.boardsDao().updateBoard(board) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+        subscriptions.add(boardSub)
+    }
+
+    private fun updateBoardProjects(old: List<BoardProjectJoin>, new: List<BoardProjectJoin>) {
+        val boardSub = Observable.fromCallable { database.boardProjectJoinsDao().updateProjectsJoinsOfBoard(old, new) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe()
@@ -240,6 +247,7 @@ class BoardDetailsActivity : RxBaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     board = it
+                    loadAdditionalData()
                     dialog.hide()
                 }, {
                     binding.root.snack(R.string.error) {}

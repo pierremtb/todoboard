@@ -14,11 +14,11 @@ abstract class ProjectsDao {
     @Query("SELECT * FROM projects WHERE id = :id")
     abstract fun findProject(id: Long): Flowable<List<Project>>
 
-    @Query("SELECT * FROM projects WHERE boardId = :boardId")
-    abstract fun findBoardProjects(boardId: Long): Flowable<List<Project>>
+    @Query("SELECT * FROM projects WHERE id IN(:ids)")
+    abstract fun findProjects(ids: Array<Long>): Flowable<List<Project>>
 
-    @Query("SELECT * FROM projects WHERE boardId = :boardId")
-    abstract fun findBoardProjectsSingle(boardId: Long): Single<List<Project>>
+    @Query("SELECT * FROM projects WHERE id IN(:ids)")
+    abstract fun findProjectsSingle(ids: Array<Long>): Single<List<Project>>
 
     @Query("SELECT * FROM projects WHERE userId = :userId")
     abstract fun findUserProjects(userId: Long): Flowable<List<Project>>
@@ -44,11 +44,9 @@ abstract class ProjectsDao {
     @Delete
     abstract fun deleteProjects(projects: List<Project>)
 
-    @Query("DELETE FROM projects WHERE boardId = :boardId")
-    abstract fun deleteBoardProjects(boardId: Long)
-
+    @Transaction
     open fun forceSyncBoardProjects(boardId: Long, projects: List<Project>) {
-        deleteBoardProjects(boardId)
+//        deleteBoardProjects(boardId)
         insertProjects(projects)
     }
 }

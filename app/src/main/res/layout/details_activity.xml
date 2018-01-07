@@ -12,6 +12,9 @@
         <variable
             name="user"
             type="com.pierrejacquier.todoboard.data.model.todoist.User" />
+        <variable
+            name="selectedProjects"
+            type="java.util.List&lt;com.pierrejacquier.todoboard.data.model.todoist.Project&gt;"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -98,7 +101,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:paddingEnd="16dp"
-                    android:paddingStart="16dp">
+                    android:paddingStart="@dimen/liv_keyline">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -118,11 +121,19 @@
                     bind:subtitle="@{user.email}"
                     bind:title="@{user.fullName}" />
 
+                <View
+                    android:id="@+id/colored_bar"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_height="1dp"
+                    android:background="@color/colorDivider" />
+
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:paddingEnd="16dp"
-                    android:paddingStart="16dp">
+                    android:paddingStart="@dimen/liv_keyline">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -133,30 +144,87 @@
                         android:textSize="14sp" />
                 </FrameLayout>
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/selectedProjectsRV"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:listitem="@layout/details_project_item" />
-
-                <View
-                    android:id="@+id/colored_bar"
-                    android:layout_width="match_parent"
-                    android:layout_marginStart="@dimen/liv_keyline"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_height="1dp"
-                    android:background="@color/colorDivider" />
+                    android:orientation="vertical"
+                    app:entries="@{selectedProjects}"
+                    app:layout="@{@layout/details_project_item}">
+                </LinearLayout>
 
                 <com.pierrejacquier.todoboard.commons.ListItemViewJava
                     android:id="@+id/manageProjectsButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:liv_displayMode="circularIcon"
-                    app:liv_icon="@drawable/ic_build"
-                    app:liv_multiline="false"
+                    app:liv_forceKeyline="true"
                     app:liv_title="@string/manage_selected_projects"/>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_height="1dp"
+                    android:background="@color/colorDivider" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="@dimen/liv_keyline">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/selected_timeslots"
+                        android:textSize="14sp" />
+                </FrameLayout>
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:checked="@={board.overdueEnabled}"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:text="@string/overdue"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:text="@string/today"
+                    android:checked="@={board.todayEnabled}"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:text="@string/tomorrow"
+                    android:checked="@={board.tomorrowEnabled}"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:text="@string/later"
+                    android:checked="@={board.laterEnabled}"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:text="@string/undated"
+                    android:checked="@={board.undatedEnabled}"
+                    android:textSize="16sp" />
 
             </LinearLayout>
         </ScrollView>

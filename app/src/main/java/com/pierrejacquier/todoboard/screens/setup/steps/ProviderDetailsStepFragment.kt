@@ -24,13 +24,9 @@ class ProviderDetailsStepFragment : Fragment(), BlockingStep {
 
     override fun onNextClicked(callback: StepperLayout.OnNextClickedCallback?) {
         with (activity as BoardSetupActivity) {
-                val projectsSub = Observable.fromCallable { database.projectsDao().updateProjects(selectableProjects) }
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ callback?.goToNextStep() })
-                subscriptions.add(projectsSub)
-            }
+            saveProjectsSelection({ callback?.goToNextStep() })
         }
+    }
 
     override fun onSelected() {}
 

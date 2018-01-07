@@ -10,9 +10,9 @@ import com.pierrejacquier.todoboard.*
 import com.pierrejacquier.todoboard.screens.details.BoardDetailsIntent
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.inflate
-import com.pierrejacquier.todoboard.commons.extensions.toDp
+import com.pierrejacquier.todoboard.commons.extensions.dp
 import com.pierrejacquier.todoboard.data.database.AppDatabase
-import com.pierrejacquier.todoboard.data.model.Board
+import com.pierrejacquier.todoboard.data.model.BoardExtendedWithProjects
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.main_fragment_boards.*
@@ -23,6 +23,7 @@ import com.pierrejacquier.todoboard.screens.main.adapters.BoardsAdapter
 import com.pierrejacquier.todoboard.screens.main.fragments.boards.di.DaggerBoardsListFragmentComponent
 import com.pierrejacquier.todoboard.screens.setup.DisplaySetupIntent
 import e
+import java.util.*
 
 
 class BoardsListFragment : RxBaseFragment() {
@@ -68,8 +69,8 @@ class BoardsListFragment : RxBaseFragment() {
 
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                        (activity as MainActivity)?.let {
-                            it.supportActionBar?.elevation = (if (dy == 0) 0 else 4).toDp(context).toFloat()
+                        with(activity as MainActivity) {
+                            supportActionBar?.elevation = (if (dy == 0) 0 else 4).dp(context).toFloat()
                     }
                 }
             })
@@ -79,7 +80,7 @@ class BoardsListFragment : RxBaseFragment() {
             boardsRV?.let {
                 with(it.adapter as BoardsAdapter) {
                     items = savedInstanceState.getParcelableArrayList(KEY_BOARDS)
-                    updateBoards(items)
+                    updateBoardsLayout(items)
                 }
             }
         } else {
@@ -98,7 +99,7 @@ class BoardsListFragment : RxBaseFragment() {
         }
     }
 
-    private fun updateBoards(boards: List<Board>) {
+    private fun updateBoardsLayout(boards: List<BoardExtendedWithProjects>) {
         if (boards.isEmpty()) {
             noBoardsMessage.visibility = View.VISIBLE
             boardsRV.visibility = View.GONE
@@ -109,18 +110,19 @@ class BoardsListFragment : RxBaseFragment() {
     }
 
     private fun requestBoards() {
-        val subscription = database.boardsDao().getBoardsAndUserName()
+        val subscription =  database.boardsDao().getBoardsExtendedWithProjects()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ retrievedBoards ->
                     boardsRV?.let {
                         with(boardsRV.adapter as BoardsAdapter) {
-                            items = retrievedBoards
+                            items = retrievedBoards.filter { it.board?.userId != 0.toLong() }
                         }
-                        updateBoards(retrievedBoards)
+                        updateBoardsLayout(retrievedBoards)
                     }
                 }, { err -> e { err.message?: "" } })
         subscriptions.add(subscription)
+
     }
 
     private fun addBoard() {

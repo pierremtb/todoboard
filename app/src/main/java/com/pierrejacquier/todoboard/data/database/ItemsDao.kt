@@ -1,4 +1,4 @@
-package com.pierrejacquier.todoitem.data.database
+package com.pierrejacquier.todoboard.data.database
 
 import android.arch.persistence.room.*
 import com.pierrejacquier.todoboard.data.model.todoist.Item
@@ -14,8 +14,8 @@ abstract class ItemsDao {
     @Query("SELECT * FROM items WHERE checked = 1")
     abstract fun getToDoItems(): Flowable<List<Item>>
 
-    @Query("SELECT * FROM items WHERE boardId = :boardId AND checked = 0 AND projectId IN(:projectsIds)")
-    abstract fun getBoardToDoItemsFromProjects(boardId: Long, projectsIds: Array<Long?>): Flowable<List<Item>>
+    @Query("SELECT * FROM items WHERE checked = 0 AND projectId IN(:projectsIds)")
+    abstract fun getBoardToDoItemsFromProjects(projectsIds: Array<Long?>): Flowable<List<Item>>
 
     @Query("SELECT * FROM items WHERE id = :id")
     abstract fun findItem(id: Long): Flowable<List<Item>>
@@ -41,12 +41,9 @@ abstract class ItemsDao {
     @Delete
     abstract fun deleteItems(item: List<Item>)
 
-    @Query("DELETE FROM items WHERE boardId = :boardId")
-    abstract fun deleteBoardItems(boardId: Long)
-
     @Transaction
     open fun forceSyncBoardItems(boardId: Long, items: List<Item>) {
-        deleteBoardItems(boardId)
+//        deleteBoardItems(boardId)
         insertItems(items)
     }
 }

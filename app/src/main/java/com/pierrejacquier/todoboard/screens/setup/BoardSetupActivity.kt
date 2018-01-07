@@ -20,6 +20,7 @@ import com.pierrejacquier.todoboard.commons.extensions.snack
 import com.pierrejacquier.todoboard.data.api.SyncService
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
+import com.pierrejacquier.todoboard.data.model.BoardProjectJoin
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectableProjectsAdapter
@@ -39,6 +40,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 
 fun Context.DisplaySetupIntent() = Intent(this, BoardSetupActivity::class.java)
@@ -65,6 +67,8 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
     var newBoardUserId: Long = 0
     var newBoardName: String = "New Board"
     var newBoardId: Long = 0
+
+    private var projectsJoins: List<BoardProjectJoin> = emptyList()
 
     var selectableProjects: List<Project>
         get() = with(projectsRV.adapter as SelectableProjectsAdapter) { return items }
@@ -228,7 +232,6 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
                 .subscribe({ board ->
                     newBoardUserId = board.userId
                     newBoardSyncToken = board.syncToken
-                    e { newBoardUserId.toString() }
                     findUser()
                 })
         subscriptions.add(syncSub)
@@ -283,7 +286,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         val projectsSub = database.projectsDao().findUserProjects(newBoardUserId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({  ps -> e{ ps.map { it.name }.toString()}; selectableProjects = ps }, { err -> e { err.message?: "" } })
+                .subscribe({  selectableProjects = it.sortedBy { it.itemOrder } }, { err -> e { err.message?: "" } })
         subscriptions.add(projectsSub)
     }
 
@@ -298,6 +301,17 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
                 .negativeColor(ContextCompat.getColor(this, R.color.colorPrimaryText))
                 .onNegative { dialog, _ -> dialog.hide() }
                 .show()
+    }
+
+    fun saveProjectsSelection(callback: () -> Unit) {
+        val newJoins = selectableProjects.filter { it.selected }.map { BoardProjectJoin(0, newBoardId, it.id!!) }
+        val boardSub = Observable.fromCallable {
+                        database.boardProjectJoinsDao().updateProjectsJoinsOfBoard(projectsJoins, newJoins)
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ callback() })
+            subscriptions.add(boardSub)
     }
 
     private fun deleteBoard() {

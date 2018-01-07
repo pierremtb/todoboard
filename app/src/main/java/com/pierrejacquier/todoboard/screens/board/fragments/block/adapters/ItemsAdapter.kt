@@ -6,12 +6,18 @@ import android.view.ViewGroup
 import com.google.android.gms.tasks.Task
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
 import kotlin.properties.Delegates
+import android.R.attr.y
+import android.R.attr.x
+import android.view.Display
 
-class ItemsAdapter() : RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
+
+
+class ItemsAdapter(val screenWidth: Int): RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
 
     var items: List<Item> by Delegates.observable(emptyList()) { _, old, new ->
         autoNotify(old, new) { o, n -> o.id == n.id }
@@ -28,14 +34,15 @@ class ItemsAdapter() : RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpda
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], screenWidth)
     }
 
     class ViewHolder(private val binding: BoardTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Item) = with(binding) {
+        fun bind(item: Item, screenWidth: Int) = with(binding) {
             task = item
             dueTime = item.getDueTimeString()
+            textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - 64 else screenWidth - 99
             executePendingBindings()
         }
     }

@@ -1,9 +1,7 @@
 package com.pierrejacquier.todoboard.data.model
 
-import android.arch.persistence.room.Embedded
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import com.pierrejacquier.todoboard.data.model.todoist.TodoistAccessToken
 import paperparcel.PaperParcel
 import paperparcel.PaperParcelable
 
@@ -11,13 +9,19 @@ import paperparcel.PaperParcelable
 @Entity(tableName = "boards")
 data class Board(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    var name: String,
-    val accessToken: String,
+    var id: Long = 0,
+    var name: String = "",
+    var accessToken: String = "",
     var userId: Long = 0,
     var syncToken: String = "*",
-    val userName: String? = null
-) : PaperParcelable {
+    var userName: String? = null,
+    var overdueEnabled: Boolean = true,
+    var todayEnabled: Boolean = true,
+    var tomorrowEnabled: Boolean = true,
+    var laterEnabled: Boolean = true,
+    var undatedEnabled: Boolean = true
+
+): PaperParcelable {
     companion object {
         @JvmField val CREATOR = PaperParcelBoard.CREATOR
     }

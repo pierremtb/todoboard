@@ -203,10 +203,17 @@
     <string name="this_is_irreversible">This is irreversible</string>
     <string name="todoist_user">Todoist user</string>
     <string name="selected_projects">Selected projects</string>
-    <string name="manage_selected_projects">Manage selected projects</string>
+    <string name="manage_selected_projects">Manage selected projects…</string>
     <string name="done">Done</string>
     <string name="about">About</string>
     <string name="force_full_sync">Force full sync</string>
     <string name="syncing">Syncing</string>
     <string name="please_wait">Please wait</string>
+    <string name="label">Label</string>
+    <string name="selected_timeslots">Selected timeslots</string>
+    <string name="today">Today</string>
+    <string name="undated">Undated</string>
+    <string name="later">Later</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="overdue">Overdue</string>
 </resources>

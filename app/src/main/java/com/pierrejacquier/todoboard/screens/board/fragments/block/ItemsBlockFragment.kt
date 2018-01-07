@@ -1,13 +1,16 @@
 package com.pierrejacquier.todoboard.screens.board.fragments.block
 
+import android.graphics.Point
 import android.os.Bundle
 import android.support.annotation.MainThread
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
@@ -32,13 +35,14 @@ class ItemsBlockFragment : RxBaseFragment() {
     companion object {
         const val KEY_TYPE = "type"
 
-        const val TODAY = 0
-        const val TOMORROW = 1
-        const val LATER = 2
-        const val UNDATED = 3
-
-        val TITLES = arrayOf("Today", "Tomorrow", "Later", "Undated")
+        const val OVERDUE = 0
+        const val TODAY = 1
+        const val TOMORROW = 2
+        const val LATER = 3
+        const val UNDATED = 4
     }
+
+    private lateinit var TITLES: Array<String>
 
     lateinit var binding: BoardFragmentItemsBlockBinding
 
@@ -50,7 +54,9 @@ class ItemsBlockFragment : RxBaseFragment() {
     var items: List<Item>
         get() = with(itemsRV.adapter as ItemsAdapter) { return items }
         set(newItems) {
-            with(itemsRV.adapter as ItemsAdapter) { items = newItems }
+            itemsRV?.let {
+                with(itemsRV.adapter as ItemsAdapter) { items = newItems.sortedBy { it.itemOrder } }
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +64,16 @@ class ItemsBlockFragment : RxBaseFragment() {
                 .boardActivityComponent((activity as BoardActivity).component)
                 .build()
                 .inject(this)
+
+        with(context?.resources) {
+            TITLES = arrayOf(
+                getString(R.string.overdue),
+                getString(R.string.today),
+                getString(R.string.tomorrow),
+                getString(R.string.later),
+                getString(R.string.undated)
+            )
+        }
 
         arguments?.let {
             type = it.getInt(KEY_TYPE)
@@ -75,21 +91,22 @@ class ItemsBlockFragment : RxBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val display = activity?.windowManager?.defaultDisplay
+        val size = Point()
+        display?.getSize(size)
+
+        size.x.log()
+
         with (itemsRV) {
             setHasFixedSize(false)
             layoutManager = LinearLayoutManager(context)
-            adapter = ItemsAdapter()
+            adapter = ItemsAdapter(size.x)
         }
 
         val itemsSub = itemsManager.getItemsObservable(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { newItems ->
-                    items = newItems
-                    e { "////// ${TITLES[type]} "}
-                    e { newItems.map { it.content }.toString() }
-                    e { "////// end" }
-                }
+                .subscribe { items = it }
 
         subscriptions.add(itemsSub)
     }

@@ -5,7 +5,7 @@
 
     <data>
         <variable
-            name="project"
+            name="data"
             type="com.pierrejacquier.todoboard.data.model.todoist.Project" />
     </data>
 
@@ -14,6 +14,6 @@
         android:layout_height="wrap_content"
         app:liv_icon="@drawable/ic_label"
         app:liv_displayMode="circularIcon"
-        bind:title="@{project.name}"
-        bind:circularIconColor="@{project.getIntColor()}" />
+        bind:title="@{data.name}"
+        bind:circularIconColor="@{data.getIntColor()}" />
 </layout>

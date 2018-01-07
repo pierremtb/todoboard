@@ -13,8 +13,6 @@ data class User(
         @PrimaryKey(autoGenerate = false)
         val id: Long, //7833481
 
-        var boardId: Long = 0,
-
         @Json(name = "start_page") val startPage: String?, //overdue, today
         @Json(name = "avatar_small") val avatarSmall: String?, //https://dcff1xvirvpfp.cloudfront.net/7f5ac2e06e935f631a6c8eeeddcca7e0_small.jpg
         @Json(name = "completed_today") val completedToday: Int?, //5

@@ -6,19 +6,24 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseActivity
+import com.pierrejacquier.todoboard.commons.extensions.dp
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.api.SyncService
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.todoist.Project
+import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.di.DaggerBoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.block.ItemsBlockFragment
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import e
+import i
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_activity.*
@@ -44,10 +49,17 @@ class BoardActivity : RxBaseActivity() {
         private val AUTO_HIDE_DELAY_MILLIS = 3000
         private val UI_ANIMATION_DELAY = 300
 
+        private val OVERDUE_FRAGMENT = "overdue"
         private val TODAY_FRAGMENT = "today"
         private val TOMORROW_FRAGMENT = "tomorrow"
         private val LATER_FRAGMENT = "later"
         private val UNDATED_FRAGMENT = "undated"
+
+        private val ITEM_HEIGHT = 28
+        private val TITLE_HEIGHT = 28
+        private val SPACING_HEIGHT = 2 * 8
+
+        private val MINIMUM_DISPLAYED_ITEMS = 2
     }
 
     private val hideHandler = Handler()
@@ -73,6 +85,8 @@ class BoardActivity : RxBaseActivity() {
         false
     }
 
+    private val context = this
+
     @Inject
     lateinit var database: AppDatabase
 
@@ -86,6 +100,10 @@ class BoardActivity : RxBaseActivity() {
     var projects: List<Project> = emptyList()
 
     lateinit var component: BoardActivityComponent
+
+    var user: User? = null
+
+    private val blocks = ArrayList<Block>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,10 +122,18 @@ class BoardActivity : RxBaseActivity() {
 //        fullscreen_content.setOnClickListener { toggle() }
         board = intent.extras.getParcelable(BOARD_KEY)
 
-        showHeaderFragment()
-        showItemsFragment(ItemsBlockFragment.TODAY, R.id.firstItemsLayout, TODAY_FRAGMENT)
-        showItemsFragment(ItemsBlockFragment.TOMORROW, R.id.secondItemsLayout, TOMORROW_FRAGMENT)
-        showItemsFragment(ItemsBlockFragment.UNDATED, R.id.thirdItemsLayout, UNDATED_FRAGMENT)
+        with (board) {
+            if (overdueEnabled)
+                blocks.add(Block(OVERDUE_FRAGMENT, R.id.overdueItemsLayout, ItemsBlockFragment.OVERDUE, 0))
+            if (todayEnabled)
+                blocks.add(Block(TODAY_FRAGMENT, R.id.todayItemsLayout, ItemsBlockFragment.TODAY, 0))
+            if (tomorrowEnabled)
+                blocks.add(Block(TOMORROW_FRAGMENT, R.id.tomorrowItemsLayout, ItemsBlockFragment.TOMORROW, 0))
+            if (laterEnabled)
+                blocks.add(Block(LATER_FRAGMENT, R.id.laterItemsLayout, ItemsBlockFragment.LATER, 0))
+            if (undatedEnabled)
+                blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
+        }
 
         val syncSub = syncService.sync(board)
                 .subscribeOn(Schedulers.io())
@@ -117,6 +143,12 @@ class BoardActivity : RxBaseActivity() {
         subscriptions.add(syncSub)
 
         requestData()
+
+        val sub = itemsManager.sizesObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { it.toString() }
+        subscriptions.add(sub)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -134,10 +166,49 @@ class BoardActivity : RxBaseActivity() {
         delayedHide(100)
     }
 
+    private fun showSections() {
+        showHeaderFragment()
+        for (block in blocks) {
+            with (block) {
+                val itemsSub = itemsManager.getItemsObservable(type)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { blockItems ->
+                            itemsCount = blockItems.size
+                            height = (TITLE_HEIGHT + SPACING_HEIGHT + blockItems.size * ITEM_HEIGHT).dp(context)
+                            val frame = findViewById<FrameLayout>(layout)
+                            frame.layoutParams.height = height
+                            frame.visibility = View.VISIBLE
+                            checkHeights()
+                        }
+                subscriptions.add(itemsSub)
+                showItemsFragment(type, layout, key)
+            }
+        }
+    }
+
+    private fun checkHeights() {
+        val minimumHeight = (MINIMUM_DISPLAYED_ITEMS * ITEM_HEIGHT + TITLE_HEIGHT + SPACING_HEIGHT).dp(context)
+        val blocksTotalHeight = blocks.sumBy { it.height }
+        if (blocksTotalHeight <= blocksWrapper.measuredHeight) {
+            return
+        }
+        for (i in (blocks.size - 1) downTo 0) {
+            with (blocks[i]) {
+                if (height > minimumHeight) {
+                    height = minimumHeight
+                    findViewById<FrameLayout>(layout).layoutParams.height = height
+                    checkHeights()
+                    return
+                }
+            }
+        }
+    }
+
     private fun showHeaderFragment() {
         val ft = supportFragmentManager.beginTransaction()
         val bundle = Bundle()
-        bundle.putString(HeaderFragment.KEY_USER,board.userName)
+        bundle.putString(HeaderFragment.KEY_USER, user?.fullName)
         val fragment = HeaderFragment()
         fragment.arguments = bundle
         ft.replace(R.id.headerLayout, fragment)
@@ -187,24 +258,20 @@ class BoardActivity : RxBaseActivity() {
     }
 
     private fun requestData() {
-        val projectsSub = database.projectsDao().findBoardProjects(board.id)
+        val projectsSub = database.boardsDao().findBoardExtendedWithProjects(board.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ retrievedProjects ->
-                    projects = retrievedProjects
+                .subscribe({ boardExt ->
+                    projects = boardExt.projectsJoins.map { it.project[0] }
+                    user = boardExt.user.getOrNull(0)
+                    showSections()
                     val itemsSub = database.itemsDao()
                             .getBoardToDoItemsFromProjects(
-                                    board.id,
-                                    projects.filter { it.selected }.map { it.id }.toTypedArray()
+                                    projects.map { it.id }.toTypedArray()
                             )
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                e { "//////// BOARD items subscsribe" }
-                                e { it.map { it.content }.toString() }
-                                e { "//////// END" }
-                                itemsManager.items = it
-                            }, { err -> e { err.message ?: "" } })
+                            .subscribe({ itemsManager.items = it }, { err -> e { err.message ?: "" } })
                     subscriptions.add(itemsSub)
                 }, { err -> e { err.message ?: "" } })
         subscriptions.add(projectsSub)

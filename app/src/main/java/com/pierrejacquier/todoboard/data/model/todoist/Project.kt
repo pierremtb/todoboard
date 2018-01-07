@@ -1,6 +1,7 @@
 package com.pierrejacquier.todoboard.data.model.todoist
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 import com.pierrejacquier.todoboard.commons.Colors
 import com.squareup.moshi.Json
@@ -15,9 +16,7 @@ data class Project(
         @Json(name = "id")
         var id: Long? = 0, //170467678
 
-        var boardId: Long = 0,
 		var userId: Long = 0,
-		var selected: Boolean = true,
 
 		@Json(name = "name") var name: String? , //Inbox
 		@Json(name = "color") var color: Int , //7
@@ -33,6 +32,10 @@ data class Project(
     companion object {
         @JvmField val CREATOR = PaperParcelProject.CREATOR
     }
+
+
+    @Ignore
+    var selected: Boolean = false
 
     fun getIntColor() = Colors.getColor(this.color)
 }
