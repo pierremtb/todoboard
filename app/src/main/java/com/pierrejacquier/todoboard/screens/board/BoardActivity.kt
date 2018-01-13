@@ -28,8 +28,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_activity.*
 import javax.inject.Inject
+import kotlin.concurrent.fixedRateTimer
 
-fun Context.BoardIntent(board: Board?): Intent {
+fun Context.getBoardIntent(board: Board?): Intent {
     if (board == null) {
         return Intent(this, MainActivity::class.java)
     }
@@ -45,9 +46,7 @@ private const val BOARD_KEY = "board"
 class BoardActivity : RxBaseActivity() {
 
     companion object {
-        private val AUTO_HIDE = true
         private val AUTO_HIDE_DELAY_MILLIS = 3000
-        private val UI_ANIMATION_DELAY = 300
 
         private val OVERDUE_FRAGMENT = "overdue"
         private val TODAY_FRAGMENT = "today"
@@ -60,29 +59,6 @@ class BoardActivity : RxBaseActivity() {
         private val SPACING_HEIGHT = 2 * 8
 
         private val MINIMUM_DISPLAYED_ITEMS = 2
-    }
-
-    private val hideHandler = Handler()
-    private val hidePart2Runnable = Runnable {
-//        fullscreen_content.systemUiVisibility =
-//                View.SYSTEM_UI_FLAG_LOW_PROFILE or
-//                        View.SYSTEM_UI_FLAG_FULLSCREEN or
-//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-//                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-//                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-//                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-    }
-    private val showPart2Runnable = Runnable {
-        supportActionBar?.show()
-    }
-    private var mVisible: Boolean = false
-    private val mHideRunnable = Runnable { hide() }
-
-    private val mDelayHideTouchListener = View.OnTouchListener { _, _ ->
-        if (AUTO_HIDE) {
-            delayedHide(AUTO_HIDE_DELAY_MILLIS)
-        }
-        false
     }
 
     private val context = this
@@ -117,9 +93,6 @@ class BoardActivity : RxBaseActivity() {
         setSupportActionBar(hideableToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mVisible = true
-
-//        fullscreen_content.setOnClickListener { toggle() }
         board = intent.extras.getParcelable(BOARD_KEY)
 
         with (board) {
@@ -135,12 +108,15 @@ class BoardActivity : RxBaseActivity() {
                 blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
         }
 
-        val syncSub = syncService.sync(board)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { newBoard -> board = newBoard }
+        fixedRateTimer("sync-timer", initialDelay = 0, period = 1000 * 20) {
+            "OUHLALALALLAA".log()
+            val syncSub = syncService.sync(board)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { newBoard -> board = newBoard }
 
-        subscriptions.add(syncSub)
+            subscriptions.add(syncSub)
+        }
 
         requestData()
 
@@ -149,22 +125,54 @@ class BoardActivity : RxBaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { it.toString() }
         subscriptions.add(sub)
+
+        hideSystemUI()
+        supportActionBar?.hide()
+
+        window.decorView.setOnSystemUiVisibilityChangeListener {
+            it.log()
+            if (it == View.SYSTEM_UI_FLAG_VISIBLE) {
+                supportActionBar?.show()
+                Handler().postDelayed( {
+                    hideSystemUI()
+                    supportActionBar?.hide()
+                }, 2200)
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            android.R.id.home -> {
-                finish()
-            }
+            android.R.id.home -> { finish() }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        delayedHide(100)
+
+    // This snippet hides the system bars.
+    private fun hideSystemUI() {
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+
+                or View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+
+                or View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
+
+    // This snippet shows the system bars. It does this by removing all the flags
+    // except for the ones that make the content appear under the system bars.
+//    private fun showSystemUI() {
+//        mDecorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+//    }
+
 
     private fun showSections() {
         showHeaderFragment()
@@ -223,38 +231,6 @@ class BoardActivity : RxBaseActivity() {
         fragment.arguments = bundle
         ft.replace(layout, fragment, tag)
         ft.commit()
-    }
-
-    private fun toggle() {
-        if (mVisible) {
-            hide()
-        } else {
-            show()
-        }
-    }
-
-    private fun hide() {
-        supportActionBar?.hide()
-        mVisible = false
-
-//        hideHandler.removeCallbacks(showPart2Runnable)
-        hideHandler.postDelayed(hidePart2Runnable, UI_ANIMATION_DELAY.toLong())
-    }
-
-    private fun show() {
-//        fullscreen_content.systemUiVisibility =
-//                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-//                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        mVisible = true
-        supportActionBar?.show()
-
-        hideHandler.removeCallbacks(hidePart2Runnable)
-//        hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY.toLong())
-    }
-
-    private fun delayedHide(delayMillis: Int) {
-        hideHandler.removeCallbacks(mHideRunnable)
-        hideHandler.postDelayed(mHideRunnable, delayMillis.toLong())
     }
 
     private fun requestData() {

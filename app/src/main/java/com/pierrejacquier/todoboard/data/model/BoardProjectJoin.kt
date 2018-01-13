@@ -20,7 +20,7 @@ import paperparcel.PaperParcelable
                         entity = Project::class,
                         parentColumns = arrayOf("id"),
                         childColumns = arrayOf("projectId"),
-                        onDelete = ForeignKey.CASCADE
+                        onDelete = ForeignKey.NO_ACTION
                 )
         )
 )

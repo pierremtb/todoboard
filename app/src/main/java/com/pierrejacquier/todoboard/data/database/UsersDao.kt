@@ -12,6 +12,9 @@ interface UsersDao {
     @Query("SELECT * FROM users")
     fun getUsers(): Flowable<List<User>>
 
+    @Query("SELECT EXISTS (SELECT * FROM users WHERE id = :id LIMIT 1)")
+    fun isUser(id: Long): Single<Boolean>
+
     @Query("SELECT * FROM users WHERE id = :id")
     fun findUser(id: Long): Flowable<User>
 

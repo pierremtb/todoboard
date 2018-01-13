@@ -216,4 +216,5 @@
     <string name="later">Later</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="overdue">Overdue</string>
+    <string name="getting_data">Getting data…</string>
 </resources>

@@ -95,8 +95,6 @@ class ItemsBlockFragment : RxBaseFragment() {
         val size = Point()
         display?.getSize(size)
 
-        size.x.log()
-
         with (itemsRV) {
             setHasFixedSize(false)
             layoutManager = LinearLayoutManager(context)

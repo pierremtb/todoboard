@@ -43,7 +43,7 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 
-fun Context.DisplaySetupIntent() = Intent(this, BoardSetupActivity::class.java)
+fun Context.getSetupIntent() = Intent(this, BoardSetupActivity::class.java)
 
 class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
 
@@ -133,6 +133,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
                 if (code != null) {
                     val call = syncService.todoistApi.getAccessToken(API_OAUTH_CLIENTID, API_OAUTH_CLIENTSECRET, code)
                     setAuthLoadingState(true)
+                    stepperLayout.snack(resources.getString(R.string.getting_data)){}
                     call.enqueue(object : Callback<TodoistAccessToken> {
                         override fun onResponse(call: Call<TodoistAccessToken>, response: Response<TodoistAccessToken>) {
                             val statusCode = response.code()
@@ -140,7 +141,6 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
                                 val token = response.body()
                                 if (token != null) {
                                     newBoardAccessToken = token.accessToken
-
                                     prepareNewBoard()
                                 }
                             } else {
@@ -210,7 +210,6 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
     }
 
     // Auth step
-
     fun prepareNewBoard() {
         val boardSub = Observable.fromCallable {
                     database.boardsDao()
@@ -225,7 +224,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         subscriptions.add(boardSub)
     }
 
-    fun syncData() {
+    private fun syncData() {
         val syncSub = syncService.sync(Board(0, newBoardName, newBoardAccessToken), true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -237,7 +236,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         subscriptions.add(syncSub)
     }
 
-    fun findUser() {
+    private fun findUser() {
         val userSub = database.usersDao().findUser(newBoardUserId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -248,7 +247,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         subscriptions.add(userSub)
     }
 
-    fun displayUser() {
+    private fun displayUser() {
         if (newBoardUser != null) {
             todoistAuthButton.visibility = View.GONE
             newUserName.text = newBoardUser?.fullName
@@ -272,7 +271,6 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
     }
 
     // Details step
-
     private fun prepareProjectsUI() {
         projectsRV.apply {
             setHasFixedSize(true)
@@ -286,7 +284,12 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         val projectsSub = database.projectsDao().findUserProjects(newBoardUserId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({  selectableProjects = it.sortedBy { it.itemOrder } }, { err -> e { err.message?: "" } })
+                .subscribe({
+                    selectableProjects = it.sortedBy { it.itemOrder }
+                }, {
+                    err -> e { err.message?: "" }
+                    stepperLayout.snack(R.string.error) {}
+                })
         subscriptions.add(projectsSub)
     }
 

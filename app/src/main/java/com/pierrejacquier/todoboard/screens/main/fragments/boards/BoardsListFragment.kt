@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.*
-import com.pierrejacquier.todoboard.screens.details.BoardDetailsIntent
+import com.pierrejacquier.todoboard.screens.details.getDetailsIntent
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.inflate
 import com.pierrejacquier.todoboard.commons.extensions.dp
@@ -17,11 +17,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.main_fragment_boards.*
 import javax.inject.Inject
-import com.pierrejacquier.todoboard.screens.board.BoardIntent
+import com.pierrejacquier.todoboard.screens.board.getBoardIntent
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import com.pierrejacquier.todoboard.screens.main.adapters.BoardsAdapter
 import com.pierrejacquier.todoboard.screens.main.fragments.boards.di.DaggerBoardsListFragmentComponent
-import com.pierrejacquier.todoboard.screens.setup.DisplaySetupIntent
+import com.pierrejacquier.todoboard.screens.setup.getSetupIntent
 import e
 import java.util.*
 
@@ -60,10 +60,10 @@ class BoardsListFragment : RxBaseFragment() {
 
             with (adapter as BoardsAdapter) {
                 onConfigureClick = { board ->
-                    activity?.startActivity(activity?.BoardDetailsIntent(board))
+                    activity?.startActivity(activity?.getDetailsIntent(board))
                 }
                 onLaunchClick = { board ->
-                activity?.startActivity(activity?.BoardIntent(board))
+                activity?.startActivity(activity?.getBoardIntent(board))
                 }
             }
 
@@ -126,7 +126,7 @@ class BoardsListFragment : RxBaseFragment() {
     }
 
     private fun addBoard() {
-        activity?.startActivity(activity?.DisplaySetupIntent())
+        activity?.startActivity(activity?.getSetupIntent())
     }
 
 }

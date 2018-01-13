@@ -15,6 +15,7 @@ import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.CircleTransform
 import com.pierrejacquier.todoboard.commons.RxBaseActivity
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.commons.extensions.snack
 import com.pierrejacquier.todoboard.data.api.SyncService
 import com.pierrejacquier.todoboard.data.database.AppDatabase
@@ -23,7 +24,7 @@ import com.pierrejacquier.todoboard.data.model.BoardProjectJoin
 import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.data.model.todoist.User
 import com.pierrejacquier.todoboard.databinding.DetailsActivityBinding
-import com.pierrejacquier.todoboard.screens.board.BoardIntent
+import com.pierrejacquier.todoboard.screens.board.getBoardIntent
 import com.pierrejacquier.todoboard.screens.details.adapters.SelectableProjectsAdapter
 import com.pierrejacquier.todoboard.screens.details.di.DaggerBoardDetailsActivityComponent
 import com.pierrejacquier.todoboard.screens.main.MainActivity
@@ -36,7 +37,7 @@ import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
 
-fun Context.BoardDetailsIntent(board: Board?): Intent {
+fun Context.getDetailsIntent(board: Board?): Intent {
     if (board == null) {
         return Intent(this, MainActivity::class.java)
     }
@@ -99,7 +100,7 @@ class BoardDetailsActivity : RxBaseActivity() {
 
         launchBoardFab.setOnClickListener { _ ->
             updateBoard()
-            startActivity(BoardIntent(board))
+            startActivity(getBoardIntent(board))
         }
 
 

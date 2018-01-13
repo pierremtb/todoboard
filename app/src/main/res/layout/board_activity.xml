@@ -5,24 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     android:background="#000"
+    android:animateLayoutChanges="true"
     tools:context="com.pierrejacquier.todoboard.screens.board.BoardActivity">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/hideableToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/grey50"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-        android:theme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="MyBoard"
-        app:titleTextColor="@color/colorSecondaryText"/>
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
 
     <FrameLayout
         android:id="@+id/headerLayout"
@@ -109,4 +93,20 @@
 
 
     </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/hideableToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/grey50"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingTop="24dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        android:theme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="MyBoard"
+        app:titleTextColor="@color/colorSecondaryText"/>
+
 </android.support.constraint.ConstraintLayout>
