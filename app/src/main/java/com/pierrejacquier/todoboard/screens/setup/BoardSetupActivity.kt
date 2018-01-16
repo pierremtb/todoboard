@@ -97,10 +97,6 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
         stepperLayout.adapter = SetupFragmentStepAdapter(supportFragmentManager, this)
         stepperLayout.setListener(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        }
-
         if (savedInstanceState != null && savedInstanceState.containsKey(NEW_BOARD_USER_KEY)) {
             newBoardUser = savedInstanceState.getParcelable(NEW_BOARD_USER_KEY)
         }

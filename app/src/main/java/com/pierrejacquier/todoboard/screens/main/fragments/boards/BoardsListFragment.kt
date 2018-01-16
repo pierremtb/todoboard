@@ -11,6 +11,7 @@ import com.pierrejacquier.todoboard.screens.details.getDetailsIntent
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.inflate
 import com.pierrejacquier.todoboard.commons.extensions.dp
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.BoardExtendedWithProjects
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -57,6 +58,8 @@ class BoardsListFragment : RxBaseFragment() {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = BoardsAdapter()
+            "HHHHHHHHHHHHH".log()
+            adapter.hasStableIds().log()
 
             with (adapter as BoardsAdapter) {
                 onConfigureClick = { board ->

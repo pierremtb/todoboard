@@ -7,7 +7,7 @@ import com.squareup.moshi.Json
 data class Item(
 
         @PrimaryKey(autoGenerate = false)
-        @Json(name = "id") val id: Long?, //2391052307
+        @Json(name = "id") val id: Long = 0, //2391052307
 
         @Json(name = "user_id") val userId: Long?, //7833481
         @Json(name = "project_id") val projectId: Long?, //2156294426

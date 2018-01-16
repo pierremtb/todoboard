@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.BoardExtendedWithProjects
 import com.pierrejacquier.todoboard.data.model.todoist.Project
@@ -13,6 +14,11 @@ import kotlinx.android.synthetic.main.main_board_item.view.*
 import kotlin.properties.Delegates
 
 class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdatableAdapter {
+
+    init {
+        setHasStableIds(true)
+        "oh hai".log()
+    }
 
     var items: List<BoardExtendedWithProjects> by Delegates.observable(emptyList()) { _, old, new ->
         autoNotify(old, new) { o, n -> o.board?.id == n.board?.id }
@@ -32,6 +38,10 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
             )
 
     override fun getItemCount() = items.size
+
+    override fun getItemId(position: Int): Long {
+        return items[position].board?.id!!
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]

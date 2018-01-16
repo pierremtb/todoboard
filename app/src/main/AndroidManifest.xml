@@ -34,7 +34,7 @@
         <activity
             android:name=".screens.setup.BoardSetupActivity"
             android:label="@string/title_activity_board_setup"
-            android:theme="@style/BoardDetailsTheme">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

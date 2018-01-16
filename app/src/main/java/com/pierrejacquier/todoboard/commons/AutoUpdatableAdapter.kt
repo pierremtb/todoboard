@@ -4,7 +4,7 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 
 /**
- * Fron Antonio Leiva https://github.com/antoniolg/diffutil-recyclerview-kotlin/tree/master/app/src/main/java/com/antonioleiva/diffutilkotlin
+ * From Antonio Leiva https://github.com/antoniolg/diffutil-recyclerview-kotlin/tree/master/app/src/main/java/com/antonioleiva/diffutilkotlin
  */
 
 interface AutoUpdatableAdapter {

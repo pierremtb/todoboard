@@ -27,6 +27,7 @@ import i
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_activity.*
+import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 
@@ -46,7 +47,7 @@ private const val BOARD_KEY = "board"
 class BoardActivity : RxBaseActivity() {
 
     companion object {
-        private val AUTO_HIDE_DELAY_MILLIS = 3000
+        private val AUTO_REFRESH_SECONDS = 20
 
         private val OVERDUE_FRAGMENT = "overdue"
         private val TODAY_FRAGMENT = "today"
@@ -81,6 +82,8 @@ class BoardActivity : RxBaseActivity() {
 
     private val blocks = ArrayList<Block>()
 
+    private lateinit var refreshTimer: Timer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -108,8 +111,7 @@ class BoardActivity : RxBaseActivity() {
                 blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
         }
 
-        fixedRateTimer("sync-timer", initialDelay = 0, period = 1000 * 20) {
-            "OUHLALALALLAA".log()
+        refreshTimer = fixedRateTimer("sync-timer", initialDelay = 0, period = (1000 * AUTO_REFRESH_SECONDS).toLong()) {
             val syncSub = syncService.sync(board)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -149,6 +151,10 @@ class BoardActivity : RxBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        refreshTimer.cancel()
+        super.onDestroy()
+    }
 
     // This snippet hides the system bars.
     private fun hideSystemUI() {
@@ -237,6 +243,7 @@ class BoardActivity : RxBaseActivity() {
         val projectsSub = database.boardsDao().findBoardExtendedWithProjects(board.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .take(1)
                 .subscribe({ boardExt ->
                     projects = boardExt.projectsJoins.map { it.project[0] }
                     user = boardExt.user.getOrNull(0)

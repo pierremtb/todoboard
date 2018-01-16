@@ -40,7 +40,7 @@ class ItemsManager {
 
     lateinit var sizesSubscriber: ObservableEmitter<Map<Int, Long>>
 
-    var sizesObservable = Observable.create<Map<Int, Long>> {
+    var sizesObservable: Observable<Map<Int, Long>> = Observable.create<Map<Int, Long>> {
         sizesSubscriber = it
     }
 

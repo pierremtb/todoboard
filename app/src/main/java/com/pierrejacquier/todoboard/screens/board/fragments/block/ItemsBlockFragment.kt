@@ -3,7 +3,10 @@ package com.pierrejacquier.todoboard.screens.board.fragments.block
 import android.graphics.Point
 import android.os.Bundle
 import android.support.annotation.MainThread
+import android.support.v7.util.DiffUtil
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +25,7 @@ import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItems
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment.Companion.KEY_USER
 import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHeaderFragmentComponent
 import e
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.main_fragment_boards.*
@@ -29,6 +33,7 @@ import kotlinx.android.synthetic.main.board_fragment_items_block.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class ItemsBlockFragment : RxBaseFragment() {
 
@@ -51,13 +56,7 @@ class ItemsBlockFragment : RxBaseFragment() {
     @Inject
     lateinit var itemsManager: ItemsManager
 
-    var items: List<Item>
-        get() = with(itemsRV.adapter as ItemsAdapter) { return items }
-        set(newItems) {
-            itemsRV?.let {
-                with(itemsRV.adapter as ItemsAdapter) { items = newItems.sortedBy { it.itemOrder } }
-            }
-        }
+    private lateinit var itemsAdapter: ItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         DaggerItemsBlockFragmentComponent.builder()
@@ -95,19 +94,22 @@ class ItemsBlockFragment : RxBaseFragment() {
         val size = Point()
         display?.getSize(size)
 
-        with (itemsRV) {
-            setHasFixedSize(false)
-            layoutManager = LinearLayoutManager(context)
-            adapter = ItemsAdapter(size.x)
-        }
+        itemsAdapter = ItemsAdapter(size.x)
 
+        with (itemsRV) {
+//            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = itemsAdapter
+            (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
+        }
         val itemsSub = itemsManager.getItemsObservable(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { items = it }
+                .subscribe { itemsAdapter.items = it }
 
         subscriptions.add(itemsSub)
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

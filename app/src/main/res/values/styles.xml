@@ -38,6 +38,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="BoardSetupTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+
     <!--<style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">-->
         <!--<item name="android:background">@color/black_overlay</item>-->
     <!--</style>-->
