@@ -30,7 +30,7 @@ task clean(type: Delete) {
 
 ext {
     versions = [
-            support: '27.0.1',
+            support: '27.0.2',
             dagger: '2.12',
             arch: '1.0.0',
             gradlePlugin: '3.0.0-rc2',

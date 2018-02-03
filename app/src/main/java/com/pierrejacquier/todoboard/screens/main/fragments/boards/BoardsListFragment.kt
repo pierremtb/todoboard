@@ -58,8 +58,6 @@ class BoardsListFragment : RxBaseFragment() {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = BoardsAdapter()
-            "HHHHHHHHHHHHH".log()
-            adapter.hasStableIds().log()
 
             with (adapter as BoardsAdapter) {
                 onConfigureClick = { board ->

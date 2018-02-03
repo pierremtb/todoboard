@@ -217,4 +217,7 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="overdue">Overdue</string>
     <string name="getting_data">Getting data…</string>
+    <string name="project_view">Project view</string>
+    <string name="dont_want_timeslots_but_task_indents_instead">Don\'t want timeslots but task indents instead?</string>
+    <string name="you_cant_have_more_than_one_project_for_that">You can\'t have more than one project for that</string>
 </resources>

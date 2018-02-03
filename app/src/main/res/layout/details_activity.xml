@@ -185,6 +185,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/single_line_height"
                     android:checked="@={board.overdueEnabled}"
+                    android:enabled="@{!board.projectViewEnabled}"
                     android:paddingEnd="@dimen/liv_padding_end"
                     android:paddingStart="@dimen/liv_keyline"
                     android:text="@string/overdue"
@@ -197,6 +198,7 @@
                     android:paddingEnd="@dimen/liv_padding_end"
                     android:text="@string/today"
                     android:checked="@={board.todayEnabled}"
+                    android:enabled="@{!board.projectViewEnabled}"
                     android:textSize="16sp" />
 
                 <Switch
@@ -206,6 +208,7 @@
                     android:paddingEnd="@dimen/liv_padding_end"
                     android:text="@string/tomorrow"
                     android:checked="@={board.tomorrowEnabled}"
+                    android:enabled="@{!board.projectViewEnabled}"
                     android:textSize="16sp" />
 
                 <Switch
@@ -215,6 +218,7 @@
                     android:paddingEnd="@dimen/liv_padding_end"
                     android:text="@string/later"
                     android:checked="@={board.laterEnabled}"
+                    android:enabled="@{!board.projectViewEnabled}"
                     android:textSize="16sp" />
 
                 <Switch
@@ -224,6 +228,39 @@
                     android:paddingEnd="@dimen/liv_padding_end"
                     android:text="@string/undated"
                     android:checked="@={board.undatedEnabled}"
+                    android:enabled="@{!board.projectViewEnabled}"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_height="1dp"
+                    android:background="@color/colorDivider" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="@dimen/liv_keyline">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/dont_want_timeslots_but_task_indents_instead"
+                        android:textSize="14sp" />
+                </FrameLayout>
+
+                <Switch
+                    android:id="@+id/projectViewSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:checked="@={board.projectViewEnabled}"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:text="@string/project_view"
                     android:textSize="16sp" />
 
             </LinearLayout>

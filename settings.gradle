@@ -1,1 +1,1 @@
-include ':app', ':todoist-pojos'
+include ':app'

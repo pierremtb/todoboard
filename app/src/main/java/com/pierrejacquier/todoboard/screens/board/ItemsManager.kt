@@ -44,9 +44,9 @@ class ItemsManager {
         sizesSubscriber = it
     }
 
-    fun getItemsObservable(type: Int): Observable<List<Item>> =
+    fun getItemsObservable(type: Int, projectId: Long = 0): Observable<List<Item>> =
             observable.map { items ->
-                val newItems = items.filter(getFilter(type))
+                val newItems = items.filter(getFilter(type, projectId))
                 sectionsSizes.plus(Pair(type, newItems.size))
                 newItems
             }
@@ -55,8 +55,9 @@ class ItemsManager {
         observable = mainObservable.mergeWith(refreshSubject.flatMap { _ -> mainObservable })
     }
 
-    private fun getFilter(type: Int): (Item) -> Boolean {
+    private fun getFilter(type: Int, projectId: Long = 0): (Item) -> Boolean {
         when (type) {
+            ItemsBlockFragment.PROJECT -> return { it.projectId == projectId }
             ItemsBlockFragment.OVERDUE -> return { checkOverdue(it) }
             ItemsBlockFragment.TODAY -> return { checkToday(it) }
             ItemsBlockFragment.TOMORROW -> return { checkTomorrow(it) }
@@ -65,7 +66,6 @@ class ItemsManager {
         }
         return { true }
     }
-    //Tue 07 Nov 2017 03:34:59 +0000
 
     private fun checkOverdue(item: Item): Boolean {
         item.dueDateUtc?.let {

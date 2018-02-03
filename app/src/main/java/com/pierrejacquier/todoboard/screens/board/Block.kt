@@ -5,5 +5,6 @@ data class Block(
         val layout: Int,
         val type: Int,
         var height: Int,
-        var itemsCount: Int = 0
+        var itemsCount: Int = 0,
+        var projectId: Long = 0
 )

@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.CompoundButton
+import android.widget.Switch
 import com.afollestad.materialdialogs.MaterialDialog
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
@@ -75,9 +77,9 @@ class BoardDetailsActivity : RxBaseActivity() {
 
     lateinit var binding: DetailsActivityBinding
 
-    lateinit private var projectsDialog: MaterialDialog
+    private lateinit var projectsDialog: MaterialDialog
 
-    lateinit private var selectableProjectsRV: RecyclerView
+    private lateinit var selectableProjectsRV: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +92,14 @@ class BoardDetailsActivity : RxBaseActivity() {
         board = intent.extras.getParcelable(BOARD_DETAILS_KEY)
 
         binding.board = board
+
+        binding.projectViewSwitch.setOnClickListener {
+            if (binding.projectViewSwitch.isChecked && projectsJoins.size > 1) {
+                board.projectViewEnabled = false
+                binding.root.snack(resources.getString(R.string.you_cant_have_more_than_one_project_for_that)) {}
+            }
+            binding.invalidateAll()
+        }
 
         DaggerBoardDetailsActivityComponent.builder()
                 .todoboardAppComponent(TodoboardApp.withActivity(this).component)
@@ -131,6 +141,7 @@ class BoardDetailsActivity : RxBaseActivity() {
         }
 
         manageProjectsButton.setOnClickListener { projectsDialog.show() }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

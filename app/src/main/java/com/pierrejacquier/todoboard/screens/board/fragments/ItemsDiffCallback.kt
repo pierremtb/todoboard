@@ -1,4 +1,4 @@
-package com.pierrejacquier.todoboard.screens.board.fragments.block
+package com.pierrejacquier.todoboard.screens.board.fragments
 
 import android.support.v7.util.DiffUtil
 import com.pierrejacquier.todoboard.data.model.todoist.Item

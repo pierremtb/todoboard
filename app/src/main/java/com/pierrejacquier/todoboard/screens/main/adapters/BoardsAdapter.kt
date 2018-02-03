@@ -17,7 +17,6 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
 
     init {
         setHasStableIds(true)
-        "oh hai".log()
     }
 
     var items: List<BoardExtendedWithProjects> by Delegates.observable(emptyList()) { _, old, new ->

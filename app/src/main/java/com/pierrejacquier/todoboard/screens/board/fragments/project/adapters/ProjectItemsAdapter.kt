@@ -1,19 +1,26 @@
-package com.pierrejacquier.todoboard.screens.board.fragments.block.adapters
+package com.pierrejacquier.todoboard.screens.board.fragments.project.adapters
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
+import com.pierrejacquier.todoboard.commons.extensions.dp
 import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.model.todoist.Item
+import com.pierrejacquier.todoboard.databinding.BoardProjectTaskItemBinding
 import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
 import kotlin.properties.Delegates
 
 
-class ItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
+class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
 
     init {
         setHasStableIds(true)
+    }
+
+    companion object {
+        const val CONTENT_LEFT_OFFSET = 12 + 16
     }
 
     var items: List<Item> by Delegates.observable(emptyList()) { _, old, new ->
@@ -22,7 +29,7 @@ class ItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ItemsAdapter.View
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(
-                    BoardTaskItemBinding.inflate(
+                    BoardProjectTaskItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent, false
                     )
@@ -38,12 +45,15 @@ class ItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ItemsAdapter.View
         holder.bind(items[position], screenWidth)
     }
 
-    class ViewHolder(private val binding: BoardTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: BoardProjectTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Item, screenWidth: Int) = with(binding) {
             task = item
             dueTime = item.getDueTimeString()
-            textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - 164 else screenWidth - 199
+
+            val indentWidth = ((item.indent!! - 1) * CONTENT_LEFT_OFFSET).dp(binding.root.context)
+            textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - indentWidth - 164 else screenWidth - indentWidth - 199
+            indenter.layoutParams.width = indentWidth
             executePendingBindings()
         }
     }

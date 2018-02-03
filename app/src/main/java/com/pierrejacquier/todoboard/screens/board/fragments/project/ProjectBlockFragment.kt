@@ -1,4 +1,4 @@
-package com.pierrejacquier.todoboard.screens.board.fragments.block
+package com.pierrejacquier.todoboard.screens.board.fragments.project
 
 import android.content.res.Configuration
 import android.graphics.Point
@@ -17,14 +17,19 @@ import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.todoist.Item
+import com.pierrejacquier.todoboard.data.model.todoist.Project
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
+import com.pierrejacquier.todoboard.databinding.BoardFragmentProjectBlockBinding
 import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
 import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
+import com.pierrejacquier.todoboard.screens.board.fragments.block.ItemsBlockFragment
 import com.pierrejacquier.todoboard.screens.board.fragments.block.adapters.ItemsAdapter
 import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItemsBlockFragmentComponent
+import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerProjectBlockFragmentComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment.Companion.KEY_USER
 import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHeaderFragmentComponent
+import com.pierrejacquier.todoboard.screens.board.fragments.project.adapters.ProjectItemsAdapter
 import e
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,80 +41,63 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class ItemsBlockFragment : RxBaseFragment() {
+class ProjectBlockFragment : RxBaseFragment() {
 
     companion object {
-        const val KEY_TYPE = "type"
-
-        const val OVERDUE = 0
-        const val TODAY = 1
-        const val TOMORROW = 2
-        const val LATER = 3
-        const val UNDATED = 4
-        const val PROJECT = 5
+        val KEY_PROJECT_ID = "project-id"
     }
 
-    private lateinit var TITLES: Array<String>
+    lateinit var binding: BoardFragmentProjectBlockBinding
 
-    lateinit var binding: BoardFragmentItemsBlockBinding
-
-    var type = 0
+    lateinit var project: Project
 
     @Inject
     lateinit var itemsManager: ItemsManager
 
-    private lateinit var itemsAdapter: ItemsAdapter
+    private lateinit var itemsAdapter: ProjectItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        DaggerItemsBlockFragmentComponent.builder()
+        DaggerProjectBlockFragmentComponent.builder()
                 .boardActivityComponent((activity as BoardActivity).component)
                 .build()
                 .inject(this)
 
-        with(context?.resources) {
-            TITLES = arrayOf(
-                getString(R.string.overdue),
-                getString(R.string.today),
-                getString(R.string.tomorrow),
-                getString(R.string.later),
-                getString(R.string.undated)
-            )
-        }
-
         arguments?.let {
-            type = it.getInt(KEY_TYPE)
+            project = it.getParcelable(KEY_PROJECT_ID)
         }
 
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = BoardFragmentItemsBlockBinding.inflate(inflater, container, false)
-        binding.title = TITLES[type]
+        binding = BoardFragmentProjectBlockBinding
+                 .inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val display = activity?.windowManager?.defaultDisplay
-        val size = Point()
-        display?.getSize(size)
-
-        itemsAdapter = ItemsAdapter(size.x)
+        itemsAdapter = ProjectItemsAdapter(getWidth())
 
         with (itemsRV) {
-//            setHasFixedSize(true)
+            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = itemsAdapter
             (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
         }
-        val itemsSub = itemsManager.getItemsObservable(type)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { itemsAdapter.items = it }
 
-        subscriptions.add(itemsSub)
+        binding.title = project.name
+
+        if (project.id != null) {
+            val itemsSub = itemsManager.getItemsObservable(ItemsBlockFragment.PROJECT, project.id!!)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { itemsAdapter.items = it.sortedBy { it.itemOrder } }
+
+            subscriptions.add(itemsSub)
+        }
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -125,5 +113,16 @@ class ItemsBlockFragment : RxBaseFragment() {
         display?.getSize(size)
         return size.x
     }
+
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        boardsRV?.let {
+//            with(it.adapter as BoardsAdapter) {
+//                if (items.isNotEmpty()) {
+//                    outState.putParcelableArrayList(KEY_BOARDS, ArrayList(items))
+//                }
+//            }
+//        }
+//    }
 
 }

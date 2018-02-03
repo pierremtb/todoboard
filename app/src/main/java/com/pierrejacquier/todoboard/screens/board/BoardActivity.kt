@@ -2,6 +2,7 @@ package com.pierrejacquier.todoboard.screens.board
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
@@ -21,6 +22,7 @@ import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.di.DaggerBoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.block.ItemsBlockFragment
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment
+import com.pierrejacquier.todoboard.screens.board.fragments.project.ProjectBlockFragment
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import e
 import i
@@ -39,6 +41,7 @@ fun Context.getBoardIntent(board: Board?): Intent {
     bundle.putParcelable(BOARD_KEY, board)
     return Intent(this, BoardActivity::class.java).apply {
         putExtras(bundle)
+
     }
 }
 
@@ -99,16 +102,18 @@ class BoardActivity : RxBaseActivity() {
         board = intent.extras.getParcelable(BOARD_KEY)
 
         with (board) {
-            if (overdueEnabled)
-                blocks.add(Block(OVERDUE_FRAGMENT, R.id.overdueItemsLayout, ItemsBlockFragment.OVERDUE, 0))
-            if (todayEnabled)
-                blocks.add(Block(TODAY_FRAGMENT, R.id.todayItemsLayout, ItemsBlockFragment.TODAY, 0))
-            if (tomorrowEnabled)
-                blocks.add(Block(TOMORROW_FRAGMENT, R.id.tomorrowItemsLayout, ItemsBlockFragment.TOMORROW, 0))
-            if (laterEnabled)
-                blocks.add(Block(LATER_FRAGMENT, R.id.laterItemsLayout, ItemsBlockFragment.LATER, 0))
-            if (undatedEnabled)
-                blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
+            if (!projectViewEnabled) {
+                if (overdueEnabled)
+                    blocks.add(Block(OVERDUE_FRAGMENT, R.id.overdueItemsLayout, ItemsBlockFragment.OVERDUE, 0))
+                if (todayEnabled)
+                    blocks.add(Block(TODAY_FRAGMENT, R.id.todayItemsLayout, ItemsBlockFragment.TODAY, 0))
+                if (tomorrowEnabled)
+                    blocks.add(Block(TOMORROW_FRAGMENT, R.id.tomorrowItemsLayout, ItemsBlockFragment.TOMORROW, 0))
+                if (laterEnabled)
+                    blocks.add(Block(LATER_FRAGMENT, R.id.laterItemsLayout, ItemsBlockFragment.LATER, 0))
+                if (undatedEnabled)
+                    blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
+            }
         }
 
         refreshTimer = fixedRateTimer("sync-timer", initialDelay = 0, period = (1000 * AUTO_REFRESH_SECONDS).toLong()) {
@@ -132,13 +137,8 @@ class BoardActivity : RxBaseActivity() {
         supportActionBar?.hide()
 
         window.decorView.setOnSystemUiVisibilityChangeListener {
-            it.log()
             if (it == View.SYSTEM_UI_FLAG_VISIBLE) {
-                supportActionBar?.show()
-                Handler().postDelayed( {
-                    hideSystemUI()
-                    supportActionBar?.hide()
-                }, 2200)
+                popToolbar()
             }
         }
     }
@@ -151,34 +151,38 @@ class BoardActivity : RxBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+//        resetHeights()
+//        checkHeights()
+        super.onConfigurationChanged(newConfig)
+        Handler().postDelayed({
+            resetHeights()
+            checkHeights()
+        }, 500)
+    }
+
     override fun onDestroy() {
         refreshTimer.cancel()
         super.onDestroy()
     }
 
-    // This snippet hides the system bars.
+    private fun popToolbar() {
+        supportActionBar?.show()
+        Handler().postDelayed( {
+            hideSystemUI()
+            supportActionBar?.hide()
+        }, 2200)
+    }
+
+    // TODO: check activity height if hidden
     private fun hideSystemUI() {
-        // Set the IMMERSIVE flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-
-                or View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
-
-    // This snippet shows the system bars. It does this by removing all the flags
-    // except for the ones that make the content appear under the system bars.
-//    private fun showSystemUI() {
-//        mDecorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-//    }
-
 
     private fun showSections() {
         showHeaderFragment()
@@ -189,10 +193,7 @@ class BoardActivity : RxBaseActivity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { blockItems ->
                             itemsCount = blockItems.size
-                            height = (TITLE_HEIGHT + SPACING_HEIGHT + blockItems.size * ITEM_HEIGHT).dp(context)
-                            val frame = findViewById<FrameLayout>(layout)
-                            frame.layoutParams.height = height
-                            frame.visibility = View.VISIBLE
+                            resetHeights()
                             checkHeights()
                         }
                 subscriptions.add(itemsSub)
@@ -201,15 +202,34 @@ class BoardActivity : RxBaseActivity() {
         }
     }
 
+    private fun resetHeights() {
+        for (block in blocks) {
+            with (block) {
+                if (itemsCount > 0) {
+                    height = (TITLE_HEIGHT + SPACING_HEIGHT + itemsCount * ITEM_HEIGHT).dp(context)
+                    val frame = findViewById<FrameLayout>(layout)
+                    frame.layoutParams.height = height
+                    frame.visibility = View.VISIBLE
+                } else {
+                    height = 0
+                }
+            }
+        }
+    }
+
+    // TODO: eventually tweak the algorithm to add more than 2 items in case of available room in the end
     private fun checkHeights() {
         val minimumHeight = (MINIMUM_DISPLAYED_ITEMS * ITEM_HEIGHT + TITLE_HEIGHT + SPACING_HEIGHT).dp(context)
         val blocksTotalHeight = blocks.sumBy { it.height }
+
         if (blocksTotalHeight <= blocksWrapper.measuredHeight) {
             return
         }
+
         for (i in (blocks.size - 1) downTo 0) {
             with (blocks[i]) {
                 if (height > minimumHeight) {
+                    "${blocks[i].key} resized to 2 items".log()
                     height = minimumHeight
                     findViewById<FrameLayout>(layout).layoutParams.height = height
                     checkHeights()
@@ -235,8 +255,22 @@ class BoardActivity : RxBaseActivity() {
         bundle.putInt(ItemsBlockFragment.KEY_TYPE, type)
         val fragment = ItemsBlockFragment()
         fragment.arguments = bundle
+        fragment.retainInstance = false
         ft.replace(layout, fragment, tag)
         ft.commit()
+    }
+
+    private fun showProjectBlock() {
+        if (board.projectViewEnabled) {            projectItemsLayout.visibility = View.VISIBLE
+            val ft = supportFragmentManager.beginTransaction()
+            val bundle = Bundle()
+            bundle.putParcelable(ProjectBlockFragment.KEY_PROJECT_ID, projects[0])
+            val fragment = ProjectBlockFragment()
+            fragment.arguments = bundle
+            fragment.retainInstance = false
+            ft.replace(R.id.projectItemsLayout, fragment, "project-view")
+            ft.commit()
+        }
     }
 
     private fun requestData() {
@@ -247,6 +281,7 @@ class BoardActivity : RxBaseActivity() {
                 .subscribe({ boardExt ->
                     projects = boardExt.projectsJoins.map { it.project[0] }
                     user = boardExt.user.getOrNull(0)
+                    showProjectBlock()
                     showSections()
                     val itemsSub = database.itemsDao()
                             .getBoardToDoItemsFromProjects(
@@ -257,6 +292,5 @@ class BoardActivity : RxBaseActivity() {
                             .subscribe({ itemsManager.items = it }, { err -> e { err.message ?: "" } })
                     subscriptions.add(itemsSub)
                 }, { err -> e { err.message ?: "" } })
-        subscriptions.add(projectsSub)
-    }
+        subscriptions.add(projectsSub)    }
 }
