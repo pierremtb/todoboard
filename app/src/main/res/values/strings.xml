@@ -222,4 +222,7 @@
     <string name="you_cant_have_more_than_one_project_for_that">You can\'t have more than one project for that</string>
     <string name="authorize_new_todoist_ùser">Authorize new Todoist user</string>
     <string name="add_new_todoist_user">Add new todoist user</string>
+    <string name="cast_not_available_yet">Cast not available yet</string>
+    <string name="but_definitely_on_the_road_map">But definitely on the roadmap.</string>
+    <string name="okay">Okay</string>
 </resources>

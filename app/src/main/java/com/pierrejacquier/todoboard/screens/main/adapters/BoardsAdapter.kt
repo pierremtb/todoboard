@@ -19,7 +19,7 @@ class BoardsAdapter: RecyclerView.Adapter<BoardsAdapter.ViewHolder>(), AutoUpdat
         setHasStableIds(true)
     }
 
-    var items: List<BoardExtendedWithProjects> by Delegates.observable(emptyList()) { _, old, new ->
+    var items: ArrayList<BoardExtendedWithProjects> by Delegates.observable(ArrayList()) { _, old, new ->
         autoNotify(old, new) { o, n -> o.board?.id == n.board?.id }
     }
 

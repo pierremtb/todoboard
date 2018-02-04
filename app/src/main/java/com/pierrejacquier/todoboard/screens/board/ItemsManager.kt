@@ -23,7 +23,6 @@ class ItemsManager {
 
     var mainObservable: Observable<List<Item>> = Observable.create<List<Item>> { subscriber ->
         subscriber.onNext(items)
-        sizesSubscriber.onNext(sectionsSizes)
     }
 
     var refreshSubject = PublishSubject.create<Boolean>()
@@ -36,18 +35,10 @@ class ItemsManager {
 
     var observable: Observable<List<Item>>
 
-    var sectionsSizes: Map<Int, Long> = ArrayMap()
-
-    lateinit var sizesSubscriber: ObservableEmitter<Map<Int, Long>>
-
-    var sizesObservable: Observable<Map<Int, Long>> = Observable.create<Map<Int, Long>> {
-        sizesSubscriber = it
-    }
-
     fun getItemsObservable(type: Int, projectId: Long = 0): Observable<List<Item>> =
             observable.map { items ->
                 val newItems = items.filter(getFilter(type, projectId))
-                sectionsSizes.plus(Pair(type, newItems.size))
+//                sectionsSizes.plus(Pair(type, newItems.size))
                 newItems
             }
 

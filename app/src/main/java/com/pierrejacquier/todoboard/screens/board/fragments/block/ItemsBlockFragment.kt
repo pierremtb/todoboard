@@ -100,7 +100,6 @@ class ItemsBlockFragment : RxBaseFragment() {
         itemsAdapter = ItemsAdapter(size.x)
 
         with (itemsRV) {
-//            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = itemsAdapter
             (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false

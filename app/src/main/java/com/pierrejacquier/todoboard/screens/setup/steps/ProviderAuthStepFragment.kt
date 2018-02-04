@@ -71,7 +71,9 @@ class ProviderAuthStepFragment : RxBaseFragment(), Step {
     private fun adjustLayout() {
         val usersVisibility =  if (existingUsersAdapter.items.isEmpty()) View.GONE else View.VISIBLE
 
-        divider.visibility = usersVisibility
-        existingUsersRV.visibility = usersVisibility
+        if (divider != null && existingUsersRV != null) {
+            divider.visibility = usersVisibility
+            existingUsersRV.visibility = usersVisibility
+        }
     }
 }

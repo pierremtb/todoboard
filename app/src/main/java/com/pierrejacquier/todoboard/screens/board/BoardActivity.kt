@@ -2,9 +2,13 @@ package com.pierrejacquier.todoboard.screens.board
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.support.v4.content.ContextCompat
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
@@ -23,29 +27,32 @@ import com.pierrejacquier.todoboard.screens.board.di.DaggerBoardActivityComponen
 import com.pierrejacquier.todoboard.screens.board.fragments.block.ItemsBlockFragment
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment
 import com.pierrejacquier.todoboard.screens.board.fragments.project.ProjectBlockFragment
+import com.pierrejacquier.todoboard.screens.details.getDetailsIntent
 import com.pierrejacquier.todoboard.screens.main.MainActivity
 import e
 import i
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_activity.*
+import kotlinx.android.synthetic.main.main_activity.*
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
+import com.afollestad.materialdialogs.MaterialDialog
+
+
 
 fun Context.getBoardIntent(board: Board?): Intent {
     if (board == null) {
         return Intent(this, MainActivity::class.java)
     }
-    val bundle = Bundle()
-    bundle.putParcelable(BOARD_KEY, board)
     return Intent(this, BoardActivity::class.java).apply {
-        putExtras(bundle)
+        putExtra(BOARD_KEY, board.id)
 
     }
 }
 
-private const val BOARD_KEY = "board"
+const val BOARD_KEY = "board"
 
 class BoardActivity : RxBaseActivity() {
 
@@ -76,6 +83,8 @@ class BoardActivity : RxBaseActivity() {
     @Inject
     lateinit var itemsManager: ItemsManager
 
+    var boardId: Long = 0
+
     lateinit var board: Board
     var projects: List<Project> = emptyList()
 
@@ -100,57 +109,49 @@ class BoardActivity : RxBaseActivity() {
         setSupportActionBar(hideableToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        board = intent.extras.getParcelable(BOARD_KEY)
-
         headerLayout.setOnClickListener {
             popToolbar()
         }
-
-        with (board) {
-            if (!projectViewEnabled) {
-                if (overdueEnabled)
-                    blocks.add(Block(OVERDUE_FRAGMENT, R.id.overdueItemsLayout, ItemsBlockFragment.OVERDUE, 0))
-                if (todayEnabled)
-                    blocks.add(Block(TODAY_FRAGMENT, R.id.todayItemsLayout, ItemsBlockFragment.TODAY, 0))
-                if (tomorrowEnabled)
-                    blocks.add(Block(TOMORROW_FRAGMENT, R.id.tomorrowItemsLayout, ItemsBlockFragment.TOMORROW, 0))
-                if (laterEnabled)
-                    blocks.add(Block(LATER_FRAGMENT, R.id.laterItemsLayout, ItemsBlockFragment.LATER, 0))
-                if (undatedEnabled)
-                    blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
-            }
-        }
-
-        refreshTimer = fixedRateTimer("sync-timer", initialDelay = 0, period = (1000 * AUTO_REFRESH_SECONDS).toLong()) {
-            val syncSub = syncService.sync(board)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { newBoard -> board = newBoard }
-
-            subscriptions.add(syncSub)
-        }
-
-        requestData()
-
-        val sub = itemsManager.sizesObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { it.toString() }
-        subscriptions.add(sub)
-
-        hideSystemUI()
-        supportActionBar?.hide()
 
         window.decorView.setOnSystemUiVisibilityChangeListener {
             if (it == View.SYSTEM_UI_FLAG_VISIBLE) {
                 popToolbar()
             }
         }
+
+        hideSystemUI()
+        supportActionBar?.hide()
+
+        boardId = intent.getLongExtra(BOARD_KEY, 0)
+
+        if (boardId == 0.toLong()) {
+            finish()
+            return
+        }
+
+        requestData()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_board, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> { finish() }
+            R.id.action_configure -> {
+                startActivity(getDetailsIntent(board))
+                finish()
+            }
+            R.id.action_cast -> {
+                MaterialDialog.Builder(this)
+                        .title(R.string.cast_not_available_yet)
+                        .content(R.string.but_definitely_on_the_road_map)
+                        .positiveText(R.string.okay)
+                        .positiveColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .show()
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -174,6 +175,13 @@ class BoardActivity : RxBaseActivity() {
     }
 
     private fun popToolbar() {
+        if (context.packageManager.hasSystemFeature(PackageManager.FEATURE_PC)) {
+            hideableToolbar.setPadding(0, 0,0, 0)
+            hideableToolbar.layoutParams.height = 56.dp(context)
+        } else {
+            hideableToolbar.setPadding(0, 24.dp(context),0, 0)
+            hideableToolbar.layoutParams.height = 80.dp(context)
+        }
         supportActionBar?.show()
         Handler().postDelayed( {
             hideSystemUI()
@@ -191,8 +199,7 @@ class BoardActivity : RxBaseActivity() {
                 or View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
 
-    private fun showSections() {
-        showHeaderFragment()
+    private fun showBlocksFragments() {
         for (block in blocks) {
             with (block) {
                 val itemsSub = itemsManager.getItemsObservable(type)
@@ -280,24 +287,68 @@ class BoardActivity : RxBaseActivity() {
         }
     }
 
+    private fun enableBlocks() {
+        with (board) {
+            if (!projectViewEnabled) {
+                if (overdueEnabled)
+                    blocks.add(Block(OVERDUE_FRAGMENT, R.id.overdueItemsLayout, ItemsBlockFragment.OVERDUE, 0))
+                if (todayEnabled)
+                    blocks.add(Block(TODAY_FRAGMENT, R.id.todayItemsLayout, ItemsBlockFragment.TODAY, 0))
+                if (tomorrowEnabled)
+                    blocks.add(Block(TOMORROW_FRAGMENT, R.id.tomorrowItemsLayout, ItemsBlockFragment.TOMORROW, 0))
+                if (laterEnabled)
+                    blocks.add(Block(LATER_FRAGMENT, R.id.laterItemsLayout, ItemsBlockFragment.LATER, 0))
+                if (undatedEnabled)
+                    blocks.add(Block(UNDATED_FRAGMENT, R.id.undatedItemsLayout, ItemsBlockFragment.UNDATED, 0))
+            }
+        }
+    }
+
+    private fun startSyncTimer() {
+        refreshTimer = fixedRateTimer("sync-timer", initialDelay = 0, period = (1000 * AUTO_REFRESH_SECONDS).toLong()) {
+            val syncSub = syncService.sync(board)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { newBoard -> board = newBoard }
+
+            subscriptions.add(syncSub)
+        }
+    }
+
+    private fun retrieveTasks() {
+        val itemsSub = database.itemsDao()
+                .getBoardToDoItemsFromProjects(
+                        projects.map { it.id }.toTypedArray()
+                )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ itemsManager.items = it }, { err -> e { err.message ?: "" } })
+        subscriptions.add(itemsSub)
+    }
+
     private fun requestData() {
-        val projectsSub = database.boardsDao().findBoardExtendedWithProjects(board.id)
+        val projectsSub = database.boardsDao().findBoardExtendedWithProjects(boardId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .take(1)
                 .subscribe({ boardExt ->
+                    if (boardExt.board == null) {
+                        finish()
+                        return@subscribe
+                    }
+                    board = boardExt.board!!
+
+                    enableBlocks()
+                    startSyncTimer()
+
                     projects = boardExt.projectsJoins.map { it.project[0] }
                     user = boardExt.user.getOrNull(0)
+
                     showProjectBlock()
-                    showSections()
-                    val itemsSub = database.itemsDao()
-                            .getBoardToDoItemsFromProjects(
-                                    projects.map { it.id }.toTypedArray()
-                            )
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({ itemsManager.items = it }, { err -> e { err.message ?: "" } })
-                    subscriptions.add(itemsSub)
+                    showHeaderFragment()
+                    showBlocksFragments()
+
+                    retrieveTasks()
                 }, { err -> e { err.message ?: "" } })
         subscriptions.add(projectsSub)    }
 }

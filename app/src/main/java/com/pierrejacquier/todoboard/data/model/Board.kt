@@ -20,7 +20,8 @@ data class Board(
     var tomorrowEnabled: Boolean = true,
     var laterEnabled: Boolean = true,
     var undatedEnabled: Boolean = true,
-    var projectViewEnabled: Boolean = false
+    var projectViewEnabled: Boolean = false,
+    var order: Int = 0
 
 ): PaperParcelable {
     companion object {

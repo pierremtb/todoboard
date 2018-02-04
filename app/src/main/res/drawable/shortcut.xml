@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="38dp"
+    android:height="38dp"
+    android:viewportWidth="38"
+    android:viewportHeight="38">
+
+    <group
+        android:name="Canvas"
+        android:translateX="16"
+        android:translateY="130">
+        <path
+            android:name="path0_fill"
+            android:fillColor="#FAFAFA"
+            android:pathData="M 38 19C 38 29.4934 29.4934 38 19 38C 8.50659 38 0 29.4934 0 19C 0 8.50659
+8.50659 0 19 0C 29.4934 0 38 8.50659 38 19Z" />
+        <path
+            android:name="path1_fill"
+            android:fillColor="#000000"
+            android:pathData="M 20 0L 2 0C 0.9 0 0 0.9 0 2L 0 14C 0 15.1 0.9 16 2 16L 7 16L 7 18L 15 18L 15
+16L 20 16C 21.1 16 21.99 15.1 21.99 14L 22 2C 22 0.9 21.1 0 20 0ZM 20 14L 2 14L
+2 2L 20 2L 20 14Z" />
+    </group>
+</vector>
