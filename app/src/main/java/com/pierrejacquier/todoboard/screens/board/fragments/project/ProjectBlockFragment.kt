@@ -115,15 +115,4 @@ class ProjectBlockFragment : RxBaseFragment() {
         return size.x
     }
 
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
-//        boardsRV?.let {
-//            with(it.adapter as BoardsAdapter) {
-//                if (items.isNotEmpty()) {
-//                    outState.putParcelableArrayList(KEY_BOARDS, ArrayList(items))
-//                }
-//            }
-//        }
-//    }
-
 }

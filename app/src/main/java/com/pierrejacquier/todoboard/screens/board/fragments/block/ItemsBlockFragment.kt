@@ -15,6 +15,7 @@ import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
 import com.pierrejacquier.todoboard.commons.extensions.log
+import com.pierrejacquier.todoboard.commons.extensions.snack
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.concurrent.fixedRateTimer
 
 class ItemsBlockFragment : RxBaseFragment() {
 
@@ -47,6 +49,8 @@ class ItemsBlockFragment : RxBaseFragment() {
         const val LATER = 3
         const val UNDATED = 4
         const val PROJECT = 5
+
+        const val AUTOSCROLL_DELAY = 3
     }
 
     private lateinit var TITLES: Array<String>
@@ -59,6 +63,8 @@ class ItemsBlockFragment : RxBaseFragment() {
     lateinit var itemsManager: ItemsManager
 
     private lateinit var itemsAdapter: ItemsAdapter
+
+    private lateinit var autoScrollTimer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
@@ -110,6 +116,8 @@ class ItemsBlockFragment : RxBaseFragment() {
                 .subscribe { itemsAdapter.items = it }
 
         subscriptions.add(itemsSub)
+
+        startAutoScrollTimer()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -126,13 +134,31 @@ class ItemsBlockFragment : RxBaseFragment() {
         return size.x
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        with(itemsAdapter as ItemsAdapter) {
-            if (items.isNotEmpty()) {
-                outState.putParcelableArrayList("hey", ArrayList(items))
+    private fun startAutoScrollTimer() {
+        val delay = (1000 * AUTOSCROLL_DELAY).toLong()
+        autoScrollTimer = fixedRateTimer(
+                name = "scroll-timer",
+                initialDelay = delay,
+                period = delay
+        ) {
+            activity?.runOnUiThread {
+                if (itemsRV.computeVerticalScrollRange() > itemsRV.height) {
+                    var currentPos = (itemsRV.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    currentPos.log()
+                    (currentPos + 1).log()
+                    itemsAdapter.itemCount.log()
+                    if (currentPos == itemsAdapter.itemCount - 2) {
+                        currentPos = -1
+                        currentPos.log()
+                    }
+                    itemsRV.smoothScrollToPosition(currentPos + 2)
+                }
             }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        autoScrollTimer.cancel()
+    }
 }
