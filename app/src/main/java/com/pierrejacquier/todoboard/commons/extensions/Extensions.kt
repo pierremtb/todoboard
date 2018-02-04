@@ -10,9 +10,12 @@ import android.os.Parcelable
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import e
@@ -53,6 +56,13 @@ fun Item.getDueTimeString(): String {
     return getDueDate().toString("hh:mm")
 }
 
+fun Item.getDueDateTimeString(): String {
+    if (dueDateUtc == null) {
+        return ""
+    }
+    return "${SimpleDateFormat("EEE, MMM d", Locale.US).format(this.getDueDate())} ${this.getDueTimeString()}"
+}
+
 fun <T> RecyclerView.Adapter<*>.autoNotify(old: List<T>, new: List<T>, compare: (T, T) -> Boolean) {
     val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
 
@@ -79,3 +89,13 @@ inline fun <reified T : Parcelable> createParcel(
                             override fun createFromParcel(source: Parcel): T? = createFromParcel(source)
                             override fun newArray(size: Int): Array<out T?> = arrayOfNulls(size)
                         }
+
+fun EditText.onTextChanged(afterTextChanged: (String) -> Unit) {
+    this.addTextChangedListener(object: TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+        override fun afterTextChanged(editable: Editable?) { afterTextChanged.invoke(editable.toString()) }
+    })
+}

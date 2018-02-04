@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.setup_activity.*
@@ -103,7 +104,7 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
     }
 
     fun startTodoistAuth() {
-        val uri = "${API_LOGIN_URL}?client_id=${API_OAUTH_CLIENTID}&scope=${API_OAUTH_SCOPE}&state=${API_OAUTH_STATE}"
+        val uri = "$API_LOGIN_URL?client_id=$API_OAUTH_CLIENTID&scope=$API_OAUTH_SCOPE&state=$API_OAUTH_STATE"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
         setAuthLoadingState(true)
@@ -246,12 +247,18 @@ class BoardSetupActivity : RxBaseActivity(), StepperLayout.StepperListener {
     private fun displayUser() {
         if (newBoardUser != null) {
             todoistAuthButton.visibility = View.GONE
+            logo.visibility = View.GONE
+            divider.visibility = View.GONE
+            existingUsersRV.visibility = View.GONE
             newUserName.text = newBoardUser?.fullName
             newUserEmail.text = newBoardUser?.email
             PicassoCustomLoader(picasso)
                     .loadImage(newUserAvatar, newBoardUser?.avatarMedium, newBoardUser!!.fullName)
             newUserGroup.visibility = View.VISIBLE
-        }
+
+            Handler().postDelayed({
+                stepperLayout.proceed()
+            }, 1000)        }
     }
 
     fun setAuthLoadingState(isLoading: Boolean) {

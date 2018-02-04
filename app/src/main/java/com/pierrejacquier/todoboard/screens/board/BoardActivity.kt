@@ -50,19 +50,19 @@ private const val BOARD_KEY = "board"
 class BoardActivity : RxBaseActivity() {
 
     companion object {
-        private val AUTO_REFRESH_SECONDS = 20
+        const val AUTO_REFRESH_SECONDS = 20
 
-        private val OVERDUE_FRAGMENT = "overdue"
-        private val TODAY_FRAGMENT = "today"
-        private val TOMORROW_FRAGMENT = "tomorrow"
-        private val LATER_FRAGMENT = "later"
-        private val UNDATED_FRAGMENT = "undated"
+        const val OVERDUE_FRAGMENT = "overdue"
+        const val TODAY_FRAGMENT = "today"
+        const val TOMORROW_FRAGMENT = "tomorrow"
+        const val LATER_FRAGMENT = "later"
+        const val UNDATED_FRAGMENT = "undated"
 
-        private val ITEM_HEIGHT = 28
-        private val TITLE_HEIGHT = 28
-        private val SPACING_HEIGHT = 2 * 8
+        const val ITEM_HEIGHT = 28
+        const val TITLE_HEIGHT = 28
+        const val SPACING_HEIGHT = 2 * 8
 
-        private val MINIMUM_DISPLAYED_ITEMS = 2
+        const val MINIMUM_DISPLAYED_ITEMS = 2
     }
 
     private val context = this
@@ -95,11 +95,16 @@ class BoardActivity : RxBaseActivity() {
                 .build()
         component.inject(this)
 
+
         setContentView(R.layout.board_activity)
         setSupportActionBar(hideableToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         board = intent.extras.getParcelable(BOARD_KEY)
+
+        headerLayout.setOnClickListener {
+            popToolbar()
+        }
 
         with (board) {
             if (!projectViewEnabled) {
@@ -152,13 +157,15 @@ class BoardActivity : RxBaseActivity() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
-//        resetHeights()
-//        checkHeights()
         super.onConfigurationChanged(newConfig)
-        Handler().postDelayed({
-            resetHeights()
-            checkHeights()
-        }, 500)
+        if (!board.projectViewEnabled) {
+            Handler().postDelayed({
+                resetHeights()
+                checkHeights()
+            }, 500)
+        } else {
+            showProjectBlock()
+        }
     }
 
     override fun onDestroy() {
@@ -261,13 +268,13 @@ class BoardActivity : RxBaseActivity() {
     }
 
     private fun showProjectBlock() {
-        if (board.projectViewEnabled) {            projectItemsLayout.visibility = View.VISIBLE
+        if (board.projectViewEnabled && projects.getOrNull(0) != null) {
+            projectItemsLayout.visibility = View.VISIBLE
             val ft = supportFragmentManager.beginTransaction()
             val bundle = Bundle()
             bundle.putParcelable(ProjectBlockFragment.KEY_PROJECT_ID, projects[0])
             val fragment = ProjectBlockFragment()
             fragment.arguments = bundle
-            fragment.retainInstance = false
             ft.replace(R.id.projectItemsLayout, fragment, "project-view")
             ft.commit()
         }

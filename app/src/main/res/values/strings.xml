@@ -220,4 +220,6 @@
     <string name="project_view">Project view</string>
     <string name="dont_want_timeslots_but_task_indents_instead">Don\'t want timeslots but task indents instead?</string>
     <string name="you_cant_have_more_than_one_project_for_that">You can\'t have more than one project for that</string>
+    <string name="authorize_new_todoist_ùser">Authorize new Todoist user</string>
+    <string name="add_new_todoist_user">Add new todoist user</string>
 </resources>

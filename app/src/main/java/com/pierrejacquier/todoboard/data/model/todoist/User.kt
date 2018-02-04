@@ -47,7 +47,7 @@ data class User(
         @Json(name = "is_biz_admin") val isBizAdmin: Boolean?, //false
         @Json(name = "default_reminder") val defaultReminder: String?, //push
         @Json(name = "dateist_inline_disabled") val dateistInlineDisabled: Boolean?, //false
-        @Json(name = "token") val token: String?, //763374623daca69fe05e54131670fa70e215f7c6
+        @Json(name = "token") var token: String?, //763374623daca69fe05e54131670fa70e215f7c6
 
         @Embedded(prefix = "tzinfo")
         @Json(name = "tz_info") val tzInfo: TzInfo?

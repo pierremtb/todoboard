@@ -4,9 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
-import com.pierrejacquier.todoboard.commons.extensions.dp
-import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
-import com.pierrejacquier.todoboard.commons.extensions.log
+import com.pierrejacquier.todoboard.commons.extensions.*
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardProjectTaskItemBinding
 import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
@@ -49,11 +47,17 @@ class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectIte
 
         fun bind(item: Item, screenWidth: Int) = with(binding) {
             task = item
-            dueTime = item.getDueTimeString()
+            dueTime = item.getDueDateTimeString()
 
-            val indentWidth = ((item.indent!! - 1) * CONTENT_LEFT_OFFSET).dp(binding.root.context)
-            textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - indentWidth - 164 else screenWidth - indentWidth - 199
-            indenter.layoutParams.width = indentWidth
+            val indentWidth = (item.indent!! - 1) * CONTENT_LEFT_OFFSET
+
+            textView.maxWidth =
+                    if (dueTime.isNullOrEmpty())
+                        screenWidth - (indentWidth + 16*2 + 40).dp(binding.root.context)
+                    else
+                        screenWidth - (indentWidth + 16*2 + 40 + 13*8).dp(binding.root.context)
+
+            indenter.layoutParams.width = indentWidth.dp(binding.root.context)
             executePendingBindings()
         }
     }

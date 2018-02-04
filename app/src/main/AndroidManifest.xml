@@ -48,7 +48,6 @@
         </activity>
         <activity
             android:name=".screens.board.BoardActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_board"
             android:theme="@style/FullscreenTheme" />
 

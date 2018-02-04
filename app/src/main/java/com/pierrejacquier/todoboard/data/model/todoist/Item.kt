@@ -2,7 +2,10 @@ package com.pierrejacquier.todoboard.data.model.todoist
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import com.squareup.moshi.Json
+import paperparcel.PaperParcel
+import paperparcel.PaperParcelable
 
+@PaperParcel
 @Entity(tableName = "items")
 data class Item(
 
@@ -32,4 +35,8 @@ data class Item(
         @Json(name = "responsible_uid") val responsibleUid: String?, //null
         @Json(name = "collapsed") val collapsed: Int?, //0
         @Json(name = "date_string") val dateString: String? //every day at 10:15pm
-)
+): PaperParcelable {
+        companion object {
+                @JvmField val CREATOR = PaperParcelItem.CREATOR
+        }
+}

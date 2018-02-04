@@ -30,7 +30,7 @@ import java.util.*
 class BoardsListFragment : RxBaseFragment() {
 
     companion object {
-        private val KEY_BOARDS = "myBoards"
+        private const val KEY_BOARDS = "myBoards"
     }
 
     @Inject

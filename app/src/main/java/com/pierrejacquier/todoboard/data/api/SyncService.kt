@@ -41,6 +41,7 @@ class SyncService(val todoistApi: TodoistApi, val database: AppDatabase) {
 
         if (user != null) {
             board.userId = user.id
+            user.token = board.accessToken
 
             for (project in projects) {
                 project.userId = user.id

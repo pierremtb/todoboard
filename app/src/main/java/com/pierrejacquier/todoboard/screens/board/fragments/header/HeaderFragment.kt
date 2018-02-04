@@ -46,14 +46,10 @@ class HeaderFragment : RxBaseFragment() {
         return binding.root
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-//        boardsRV?.let {
-//            with(it.adapter as BoardsAdapter) {
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
 //                if (items.isNotEmpty()) {
 //                    outState.putParcelableArrayList(KEY_BOARDS, ArrayList(items))
 //                }
-//            }
-//        }
-    }
+//    }
 }

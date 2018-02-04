@@ -44,7 +44,7 @@ import kotlin.collections.ArrayList
 class ProjectBlockFragment : RxBaseFragment() {
 
     companion object {
-        val KEY_PROJECT_ID = "project-id"
+        const val KEY_PROJECT_ID = "project-id"
     }
 
     lateinit var binding: BoardFragmentProjectBlockBinding
@@ -57,6 +57,7 @@ class ProjectBlockFragment : RxBaseFragment() {
     private lateinit var itemsAdapter: ProjectItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        retainInstance = true
         DaggerProjectBlockFragmentComponent.builder()
                 .boardActivityComponent((activity as BoardActivity).component)
                 .build()

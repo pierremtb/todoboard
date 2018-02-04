@@ -61,6 +61,7 @@ class ItemsBlockFragment : RxBaseFragment() {
     private lateinit var itemsAdapter: ItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        retainInstance = true
         DaggerItemsBlockFragmentComponent.builder()
                 .boardActivityComponent((activity as BoardActivity).component)
                 .build()
@@ -124,6 +125,15 @@ class ItemsBlockFragment : RxBaseFragment() {
         val size = Point()
         display?.getSize(size)
         return size.x
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        with(itemsAdapter as ItemsAdapter) {
+            if (items.isNotEmpty()) {
+                outState.putParcelableArrayList("hey", ArrayList(items))
+            }
+        }
     }
 
 }

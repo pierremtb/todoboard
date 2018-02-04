@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="user"
+            type="com.pierrejacquier.todoboard.data.model.todoist.User" />
+    </data>
+
+    <com.pierrejacquier.todoboard.commons.ListItemViewJava
+        android:id="@+id/userRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:liv_displayMode="avatar"
+        app:liv_multiline="false"
+        bind:subtitle="@{user.email}"
+        bind:title="@{user.fullName}" />
+
+</layout>
