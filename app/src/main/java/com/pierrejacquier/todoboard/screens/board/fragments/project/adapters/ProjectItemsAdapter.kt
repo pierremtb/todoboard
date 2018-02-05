@@ -7,7 +7,6 @@ import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.*
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardProjectTaskItemBinding
-import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
 import kotlin.properties.Delegates
 
 
@@ -43,7 +42,7 @@ class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectIte
         holder.bind(items[position], screenWidth)
     }
 
-    class ViewHolder(private val binding: BoardProjectTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: BoardProjectTaskItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Item, screenWidth: Int) = with(binding) {
             task = item

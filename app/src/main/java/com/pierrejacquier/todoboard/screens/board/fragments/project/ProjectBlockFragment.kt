@@ -7,6 +7,7 @@ import android.support.annotation.MainThread
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.concurrent.fixedRateTimer
 
 class ProjectBlockFragment : RxBaseFragment() {
 
@@ -55,6 +57,8 @@ class ProjectBlockFragment : RxBaseFragment() {
     lateinit var itemsManager: ItemsManager
 
     private lateinit var itemsAdapter: ProjectItemsAdapter
+
+    private lateinit var autoScrollTimer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
@@ -73,6 +77,7 @@ class ProjectBlockFragment : RxBaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = BoardFragmentProjectBlockBinding
                  .inflate(inflater, container, false)
+        binding.title = project.name
         return binding.root
     }
 
@@ -82,13 +87,10 @@ class ProjectBlockFragment : RxBaseFragment() {
         itemsAdapter = ProjectItemsAdapter(getWidth())
 
         with (itemsRV) {
-            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = itemsAdapter
             (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
         }
-
-        binding.title = project.name
 
         if (project.id != null) {
             val itemsSub = itemsManager.getItemsObservable(ItemsBlockFragment.PROJECT, project.id!!)
@@ -98,6 +100,8 @@ class ProjectBlockFragment : RxBaseFragment() {
 
             subscriptions.add(itemsSub)
         }
+
+        startAutoScrollTimer()
 
     }
 
@@ -113,6 +117,32 @@ class ProjectBlockFragment : RxBaseFragment() {
         val size = Point()
         display?.getSize(size)
         return size.x
+    }
+
+    private fun startAutoScrollTimer() {
+        val delay = (1000 * ItemsBlockFragment.AUTOSCROLL_DELAY).toLong()
+        autoScrollTimer = fixedRateTimer(
+                name = "scroll-timer",
+                initialDelay = delay,
+                period = delay
+        ) {
+            activity?.runOnUiThread {
+                if (itemsRV.computeVerticalScrollRange() > itemsRV.height) {
+                    with (itemsRV.layoutManager as LinearLayoutManager) {
+                        var currentPos = findFirstVisibleItemPosition()
+                        if (findLastVisibleItemPosition() == itemsAdapter.items.size - 1) {
+                            currentPos = -1
+                        }
+                        scrollToPositionWithOffset(currentPos + 1, 0)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        autoScrollTimer.cancel()
     }
 
 }

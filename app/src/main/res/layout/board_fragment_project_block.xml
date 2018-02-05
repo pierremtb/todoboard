@@ -43,10 +43,10 @@
                 android:id="@+id/itemsRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="vertical"
-                android:scrollbarThumbVertical="@color/white"
-                android:scrollbarStyle="outsideOverlay"
                 android:fadeScrollbars="false"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarThumbVertical="@color/white"
+                android:scrollbars="vertical"
                 tools:listitem="@layout/board_task_item" />
         </ScrollView>
 

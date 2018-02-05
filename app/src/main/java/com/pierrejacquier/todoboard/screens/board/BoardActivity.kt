@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.FrameLayout
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
@@ -197,6 +198,8 @@ class BoardActivity : RxBaseActivity() {
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_IMMERSIVE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
     }
 
     private fun showBlocksFragments() {
@@ -231,24 +234,28 @@ class BoardActivity : RxBaseActivity() {
         }
     }
 
-    // TODO: eventually tweak the algorithm to add more than 2 items in case of available room in the end
+    private fun areHeightsGood() = blocks.sumBy { it.height } <= blocksWrapper.measuredHeight
+
     private fun checkHeights() {
         val minimumHeight = (MINIMUM_DISPLAYED_ITEMS * ITEM_HEIGHT + TITLE_HEIGHT + SPACING_HEIGHT).dp(context)
-        val blocksTotalHeight = blocks.sumBy { it.height }
 
-        if (blocksTotalHeight <= blocksWrapper.measuredHeight) {
+        // Checking if the minimum size is still too much
+        if (blocks.size * minimumHeight > blocksWrapper.measuredHeight) {
+            return
+        }
+
+        if (areHeightsGood()) {
             return
         }
 
         for (i in (blocks.size - 1) downTo 0) {
             with (blocks[i]) {
-                if (height > minimumHeight) {
-                    "${blocks[i].key} resized to 2 items".log()
-                    height = minimumHeight
+                while (height > minimumHeight && !areHeightsGood()) {
+                    height -= ITEM_HEIGHT
                     findViewById<FrameLayout>(layout).layoutParams.height = height
-                    checkHeights()
-                    return
                 }
+                checkHeights()
+                return
             }
         }
     }

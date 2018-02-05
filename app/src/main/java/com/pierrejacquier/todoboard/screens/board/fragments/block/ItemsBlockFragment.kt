@@ -3,39 +3,24 @@ package com.pierrejacquier.todoboard.screens.board.fragments.block
 import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Bundle
-import android.support.annotation.MainThread
-import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.R
-import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
-import com.pierrejacquier.todoboard.commons.extensions.log
-import com.pierrejacquier.todoboard.commons.extensions.snack
-import com.pierrejacquier.todoboard.data.database.AppDatabase
-import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
 import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
-import com.pierrejacquier.todoboard.screens.board.di.BoardActivityComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.block.adapters.ItemsAdapter
 import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItemsBlockFragmentComponent
-import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment.Companion.KEY_USER
-import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHeaderFragmentComponent
-import e
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.main_fragment_boards.*
 import kotlinx.android.synthetic.main.board_fragment_items_block.*
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlin.concurrent.fixedRateTimer
 
 class ItemsBlockFragment : RxBaseFragment() {
@@ -53,7 +38,7 @@ class ItemsBlockFragment : RxBaseFragment() {
         const val AUTOSCROLL_DELAY = 3
     }
 
-    private lateinit var TITLES: Array<String>
+    private lateinit var titles: Array<String>
 
     lateinit var binding: BoardFragmentItemsBlockBinding
 
@@ -66,6 +51,8 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     private lateinit var autoScrollTimer: Timer
 
+    private var columns: Int = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
         DaggerItemsBlockFragmentComponent.builder()
@@ -74,7 +61,7 @@ class ItemsBlockFragment : RxBaseFragment() {
                 .inject(this)
 
         with(context?.resources) {
-            TITLES = arrayOf(
+            titles = arrayOf(
                 getString(R.string.overdue),
                 getString(R.string.today),
                 getString(R.string.tomorrow),
@@ -92,21 +79,22 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = BoardFragmentItemsBlockBinding.inflate(inflater, container, false)
-        binding.title = TITLES[type]
+        binding.title = titles[type]
+        columns = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 1 else 2
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val display = activity?.windowManager?.defaultDisplay
-        val size = Point()
-        display?.getSize(size)
+//        val display = activity?.windowManager?.defaultDisplay
+//        val size = Point()
+//        display?.getSize(size)
 
-        itemsAdapter = ItemsAdapter(size.x)
+        itemsAdapter = ItemsAdapter(getWidth())
 
         with (itemsRV) {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = GridLayoutManager(context,columns)
             adapter = itemsAdapter
             (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
         }
@@ -131,6 +119,7 @@ class ItemsBlockFragment : RxBaseFragment() {
         val display = activity?.windowManager?.defaultDisplay
         val size = Point()
         display?.getSize(size)
+        "x:${size.x},y:${size.y}"
         return size.x
     }
 
@@ -142,16 +131,16 @@ class ItemsBlockFragment : RxBaseFragment() {
                 period = delay
         ) {
             activity?.runOnUiThread {
+                if (itemsRV == null) return@runOnUiThread
+
                 if (itemsRV.computeVerticalScrollRange() > itemsRV.height) {
-                    var currentPos = (itemsRV.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                    currentPos.log()
-                    (currentPos + 1).log()
-                    itemsAdapter.itemCount.log()
-                    if (currentPos == itemsAdapter.itemCount - 2) {
-                        currentPos = -1
-                        currentPos.log()
+                    with (itemsRV.layoutManager as LinearLayoutManager) {
+                        var currentPos = findFirstVisibleItemPosition()
+                        if (findLastVisibleItemPosition() == itemsAdapter.items.size - 1) {
+                            currentPos = -1
+                        }
+                        scrollToPositionWithOffset(currentPos + 1, 0)
                     }
-                    itemsRV.smoothScrollToPosition(currentPos + 2)
                 }
             }
         }
