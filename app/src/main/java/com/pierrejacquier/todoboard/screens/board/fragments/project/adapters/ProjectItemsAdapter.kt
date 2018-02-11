@@ -1,6 +1,7 @@
 package com.pierrejacquier.todoboard.screens.board.fragments.project.adapters
 
 import android.support.v7.widget.RecyclerView
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
@@ -10,7 +11,7 @@ import com.pierrejacquier.todoboard.databinding.BoardProjectTaskItemBinding
 import kotlin.properties.Delegates
 
 
-class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
+class ProjectItemsAdapter(var screenWidth: Int, private val fontSize: Int): RecyclerView.Adapter<ProjectItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
 
     init {
         setHasStableIds(true)
@@ -39,12 +40,21 @@ class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectIte
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], screenWidth)
+        holder.bind(items[position], screenWidth, fontSize)
     }
+
+    // Left here for future reference
+//    private fun translatePosition(pos: Int): Int {
+//        if (pos % 2 == 0) {
+//
+//            return pos / 2
+//        }
+//        return Math.ceil((itemCount / 2).toDouble()).toInt() + Math.floor((pos / 2).toDouble()).toInt() + 1
+//    }
 
     class ViewHolder(private val binding: BoardProjectTaskItemBinding): RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Item, screenWidth: Int) = with(binding) {
+        fun bind(item: Item, width: Int, fontSize: Int) = with(binding) {
             task = item
             dueTime = item.getDueDateTimeString()
 
@@ -52,11 +62,12 @@ class ProjectItemsAdapter(var screenWidth: Int): RecyclerView.Adapter<ProjectIte
 
             textView.maxWidth =
                     if (dueTime.isNullOrEmpty())
-                        screenWidth - (indentWidth + 16*2 + 40).dp(binding.root.context)
+                        width - (indentWidth + 16*2 + 40).dp(binding.root.context)
                     else
-                        screenWidth - (indentWidth + 16*2 + 40 + 13*8).dp(binding.root.context)
+                        width - (indentWidth + 16*2 + 40 + 13*8).dp(binding.root.context)
 
             indenter.layoutParams.width = indentWidth.dp(binding.root.context)
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
             executePendingBindings()
         }
     }

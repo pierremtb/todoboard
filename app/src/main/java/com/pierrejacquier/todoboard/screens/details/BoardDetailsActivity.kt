@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.NumberPicker
 import android.widget.Switch
 import com.afollestad.materialdialogs.MaterialDialog
 import com.pierrejacquier.todoboard.R
@@ -140,7 +141,24 @@ class BoardDetailsActivity : RxBaseActivity() {
             adapter = SelectableProjectsAdapter()
         }
 
+        val context = this
+
         manageProjectsButton.setOnClickListener { projectsDialog.show() }
+
+        fontSizeRow.setOnClickListener {
+            val dialog = MaterialDialog.Builder(context)
+                    .title(R.string.font_size)
+                    .customView(R.layout.dialog_font_size_picker, false)
+                    .positiveText(R.string.done)
+                    .build()
+            val numberPicker = dialog.customView?.findViewById<NumberPicker>(R.id.numberPicker)
+            numberPicker?.let {
+                it.minValue = 8
+                it.maxValue = 26
+                it.value = 18
+            }
+            dialog.show()0
+        }
 
     }
 

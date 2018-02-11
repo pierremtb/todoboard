@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import com.pierrejacquier.todoboard.R
+import com.pierrejacquier.todoboard.data.model.Board
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import e
 import khronos.toString

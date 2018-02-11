@@ -263,6 +263,55 @@
                     android:text="@string/project_view"
                     android:textSize="16sp" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_height="1dp"
+                    android:background="@color/colorDivider" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="@dimen/liv_keyline">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/display_settings"
+                        android:textSize="14sp" />
+                </FrameLayout>
+
+                <Switch
+                    android:id="@+id/allowMultiColumnsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:checked="@={board.allowForMultiColumns}"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:text="@string/allow_for_multi_columns"
+                    android:textSize="16sp" />
+
+                <!--<com.pierrejacquier.todoboard.commons.ListItemViewJava-->
+                    <!--android:id="@+id/userListItem"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--app:liv_displayMode="avatar"-->
+                    <!--app:liv_multiline="false"-->
+                    <!--bind:subtitle="@{user.email}"-->
+                    <!--bind:title="@{user.fullName}" />-->
+
+                <com.pierrejacquier.todoboard.commons.ListItemViewJava
+                    android:id="@+id/fontSizeRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    bind:title="@{@string/font_size}"
+                    bind:subtitle="@{board.getFontSizeString()}"
+                    app:liv_multiline="false"
+                    app:liv_displayMode="icon"/>
             </LinearLayout>
         </ScrollView>
         

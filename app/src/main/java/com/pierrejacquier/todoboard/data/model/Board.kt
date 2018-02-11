@@ -21,10 +21,14 @@ data class Board(
     var laterEnabled: Boolean = true,
     var undatedEnabled: Boolean = true,
     var projectViewEnabled: Boolean = false,
-    var order: Int = 0
+    var order: Int = 0,
+    var allowForMultiColumns: Boolean = true,
+    var fontSize: Int = 18
 
 ): PaperParcelable {
     companion object {
         @JvmField val CREATOR = PaperParcelBoard.CREATOR
     }
+
+    fun getFontSizeString() = fontSize.toString()
 }

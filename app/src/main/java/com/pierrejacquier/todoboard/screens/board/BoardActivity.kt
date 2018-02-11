@@ -160,18 +160,22 @@ class BoardActivity : RxBaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        if (!board.projectViewEnabled) {
-            Handler().postDelayed({
-                resetHeights()
-                checkHeights()
-            }, 500)
-        } else {
-            showProjectBlock()
+        if (this::board.isInitialized) {
+            if (!board.projectViewEnabled) {
+                Handler().postDelayed({
+                    resetHeights()
+                    checkHeights()
+                }, 500)
+            } else {
+                showProjectBlock()
+            }
         }
     }
 
     override fun onDestroy() {
-        refreshTimer.cancel()
+        if (this::refreshTimer.isInitialized) {
+            refreshTimer.cancel()
+        }
         super.onDestroy()
     }
 
@@ -274,6 +278,8 @@ class BoardActivity : RxBaseActivity() {
         val ft = supportFragmentManager.beginTransaction()
         val bundle = Bundle()
         bundle.putInt(ItemsBlockFragment.KEY_TYPE, type)
+        bundle.putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
+        bundle.putBoolean(ItemsBlockFragment.KEY_MULTI_COLUMNS, board.allowForMultiColumns)
         val fragment = ItemsBlockFragment()
         fragment.arguments = bundle
         fragment.retainInstance = false
@@ -286,6 +292,7 @@ class BoardActivity : RxBaseActivity() {
             projectItemsLayout.visibility = View.VISIBLE
             val ft = supportFragmentManager.beginTransaction()
             val bundle = Bundle()
+            bundle.putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
             bundle.putParcelable(ProjectBlockFragment.KEY_PROJECT_ID, projects[0])
             val fragment = ProjectBlockFragment()
             fragment.arguments = bundle

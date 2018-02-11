@@ -225,4 +225,7 @@
     <string name="cast_not_available_yet">Cast not available yet</string>
     <string name="but_definitely_on_the_road_map">But definitely on the roadmap.</string>
     <string name="okay">Okay</string>
+    <string name="display_settings">Display settings</string>
+    <string name="allow_for_multi_columns">Allow for multi columns (on timeslots view)</string>
+    <string name="font_size">Font size</string>
 </resources>

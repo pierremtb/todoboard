@@ -5,10 +5,7 @@ import android.graphics.Point
 import android.os.Bundle
 import android.support.annotation.MainThread
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SimpleItemAnimator
+import android.support.v7.widget.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,6 +57,8 @@ class ProjectBlockFragment : RxBaseFragment() {
 
     private lateinit var autoScrollTimer: Timer
 
+    private var fontSize: Int = 18
+
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
         DaggerProjectBlockFragmentComponent.builder()
@@ -69,6 +68,7 @@ class ProjectBlockFragment : RxBaseFragment() {
 
         arguments?.let {
             project = it.getParcelable(KEY_PROJECT_ID)
+            fontSize = it.getInt(ItemsBlockFragment.KEY_FONT_SIZE)
         }
 
         super.onCreate(savedInstanceState)
@@ -84,7 +84,7 @@ class ProjectBlockFragment : RxBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        itemsAdapter = ProjectItemsAdapter(getWidth())
+        itemsAdapter = ProjectItemsAdapter(getWidth(), fontSize)
 
         with (itemsRV) {
             layoutManager = LinearLayoutManager(context)

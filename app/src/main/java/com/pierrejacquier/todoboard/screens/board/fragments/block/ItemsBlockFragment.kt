@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
 import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
@@ -19,6 +20,7 @@ import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItems
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_fragment_items_block.*
+import kotlinx.android.synthetic.main.board_task_item.*
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
@@ -27,6 +29,8 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     companion object {
         const val KEY_TYPE = "type"
+        const val KEY_MULTI_COLUMNS = "mcol"
+        const val KEY_FONT_SIZE = "fs"
 
         const val OVERDUE = 0
         const val TODAY = 1
@@ -53,6 +57,10 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     private var columns: Int = 1
 
+    private var allowForMultiColumns: Boolean = true
+
+    private var fontSize: Int = 18
+
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
         DaggerItemsBlockFragmentComponent.builder()
@@ -72,6 +80,8 @@ class ItemsBlockFragment : RxBaseFragment() {
 
         arguments?.let {
             type = it.getInt(KEY_TYPE)
+            allowForMultiColumns = it.getBoolean(KEY_MULTI_COLUMNS)
+            fontSize = it.getInt(KEY_FONT_SIZE)
         }
 
         super.onCreate(savedInstanceState)
@@ -80,21 +90,21 @@ class ItemsBlockFragment : RxBaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = BoardFragmentItemsBlockBinding.inflate(inflater, container, false)
         binding.title = titles[type]
-        columns = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 1 else 2
+        columns = getColumnsCount()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val display = activity?.windowManager?.defaultDisplay
-//        val size = Point()
-//        display?.getSize(size)
+        val display = activity?.windowManager?.defaultDisplay
+        val size = Point()
+        display?.getSize(size)
 
-        itemsAdapter = ItemsAdapter(getWidth())
+        itemsAdapter = ItemsAdapter(getWidth() / columns, fontSize)
 
         with (itemsRV) {
-            layoutManager = GridLayoutManager(context,columns)
+            layoutManager = GridLayoutManager(context, columns)
             adapter = itemsAdapter
             (itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
         }
@@ -107,12 +117,20 @@ class ItemsBlockFragment : RxBaseFragment() {
 
         startAutoScrollTimer()
     }
-
     override fun onConfigurationChanged(newConfig: Configuration?) {
+        columns = getColumnsCount()
+        columns.log()
         itemsAdapter.screenWidth = getWidth()
         itemsRV.swapAdapter(itemsAdapter, false)
         super.onConfigurationChanged(newConfig)
 
+    }
+
+    private fun getColumnsCount(): Int {
+        if (!allowForMultiColumns) {
+            return columns
+        }
+        return resources.getInteger(R.integer.board_activity_columns_count)
     }
 
     private fun getWidth(): Int {
