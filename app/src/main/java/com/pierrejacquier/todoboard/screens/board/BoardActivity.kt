@@ -40,7 +40,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 import com.afollestad.materialdialogs.MaterialDialog
-
+import java.util.concurrent.TimeUnit
 
 
 fun Context.getBoardIntent(board: Board?): Intent {
@@ -66,8 +66,8 @@ class BoardActivity : RxBaseActivity() {
         const val LATER_FRAGMENT = "later"
         const val UNDATED_FRAGMENT = "undated"
 
-        const val ITEM_HEIGHT = 28
-        const val TITLE_HEIGHT = 28
+        const val ITEM_HEIGHT_SUP = 10
+        const val TITLE_HEIGHT_SUP = 10
         const val SPACING_HEIGHT = 2 * 8
 
         const val MINIMUM_DISPLAYED_ITEMS = 2
@@ -96,6 +96,10 @@ class BoardActivity : RxBaseActivity() {
     private val blocks = ArrayList<Block>()
 
     private lateinit var refreshTimer: Timer
+
+    private var availableHeight = 0
+
+    private var columns: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +135,8 @@ class BoardActivity : RxBaseActivity() {
         }
 
         requestData()
+
+        columns = getColumnsCount()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -160,6 +166,7 @@ class BoardActivity : RxBaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
+        columns = getColumnsCount()
         if (this::board.isInitialized) {
             if (!board.projectViewEnabled) {
                 Handler().postDelayed({
@@ -170,6 +177,17 @@ class BoardActivity : RxBaseActivity() {
                 showProjectBlock()
             }
         }
+    }
+
+    private fun getColumnsCount(): Int {
+        if (!this::board.isInitialized) {
+            return columns
+        }
+
+        if (!board.allowForMultiColumns) {
+            return columns
+        }
+        return resources.getInteger(R.integer.board_activity_columns_count)
     }
 
     override fun onDestroy() {
@@ -224,10 +242,12 @@ class BoardActivity : RxBaseActivity() {
     }
 
     private fun resetHeights() {
+        availableHeight = blocksWrapper.measuredHeight
         for (block in blocks) {
             with (block) {
                 if (itemsCount > 0) {
-                    height = (TITLE_HEIGHT + SPACING_HEIGHT + itemsCount * ITEM_HEIGHT).dp(context)
+                    val actualCount = Math.ceil(itemsCount.toDouble() / getColumnsCount()).toInt()
+                    height = (board.fontSize + TITLE_HEIGHT_SUP + SPACING_HEIGHT + actualCount * (board.fontSize + ITEM_HEIGHT_SUP)).dp(context)
                     val frame = findViewById<FrameLayout>(layout)
                     frame.layoutParams.height = height
                     frame.visibility = View.VISIBLE
@@ -238,28 +258,27 @@ class BoardActivity : RxBaseActivity() {
         }
     }
 
-    private fun areHeightsGood() = blocks.sumBy { it.height } <= blocksWrapper.measuredHeight
+    private fun areHeightsGood() = blocks.sumBy { it.height } <= availableHeight
 
     private fun checkHeights() {
-        val minimumHeight = (MINIMUM_DISPLAYED_ITEMS * ITEM_HEIGHT + TITLE_HEIGHT + SPACING_HEIGHT).dp(context)
+        val itemHeight = ITEM_HEIGHT_SUP + board.fontSize
+        val displayedItemsCount = if (getColumnsCount() > 1) 1 else MINIMUM_DISPLAYED_ITEMS
+        val minimumHeight = (displayedItemsCount * itemHeight + TITLE_HEIGHT_SUP + board.fontSize + SPACING_HEIGHT).dp(context)
 
-        // Checking if the minimum size is still too much
-        if (blocks.size * minimumHeight > blocksWrapper.measuredHeight) {
-            return
-        }
-
-        if (areHeightsGood()) {
+        // Checking if the minimum size is still too much or already good
+        if (blocks.filter { it.height != 0}.count() * minimumHeight > availableHeight || areHeightsGood()) {
             return
         }
 
         for (i in (blocks.size - 1) downTo 0) {
-            with (blocks[i]) {
-                while (height > minimumHeight && !areHeightsGood()) {
-                    height -= ITEM_HEIGHT
-                    findViewById<FrameLayout>(layout).layoutParams.height = height
+            if (areHeightsGood()) {
+                break
+            }
+            if (blocks[i].height > minimumHeight + itemHeight) {
+                while (!areHeightsGood() && blocks[i].height >= minimumHeight + itemHeight) {
+                    blocks[i].height -= itemHeight
+                    findViewById<FrameLayout>(blocks[i].layout).layoutParams.height = blocks[i].height
                 }
-                checkHeights()
-                return
             }
         }
     }

@@ -55,7 +55,7 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     private lateinit var autoScrollTimer: Timer
 
-    private var columns: Int = 1
+    var columns: Int = 1
 
     private var allowForMultiColumns: Boolean = true
 
@@ -119,7 +119,6 @@ class ItemsBlockFragment : RxBaseFragment() {
     }
     override fun onConfigurationChanged(newConfig: Configuration?) {
         columns = getColumnsCount()
-        columns.log()
         itemsAdapter.screenWidth = getWidth()
         itemsRV.swapAdapter(itemsAdapter, false)
         super.onConfigurationChanged(newConfig)

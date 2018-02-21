@@ -55,7 +55,13 @@ private const val BOARD_DETAILS_KEY = "board-details"
 
 class BoardDetailsActivity : RxBaseActivity() {
 
-    lateinit private var board: Board
+    companion object {
+        const val MIN_FONT_SIZE = 8
+        const val MAX_FONT_SIZE = 26
+        const val DEFAULT_FONT_SIZE = 18
+    }
+
+    private lateinit var board: Board
     lateinit var user: User
     private var projectsJoins: List<BoardProjectJoin> by Delegates.observable(emptyList()) { _, old, new ->
         updateBoardProjects(old, new)
@@ -153,11 +159,15 @@ class BoardDetailsActivity : RxBaseActivity() {
                     .build()
             val numberPicker = dialog.customView?.findViewById<NumberPicker>(R.id.numberPicker)
             numberPicker?.let {
-                it.minValue = 8
-                it.maxValue = 26
-                it.value = 18
+                it.minValue = MIN_FONT_SIZE
+                it.maxValue = MAX_FONT_SIZE
+                it.value = board.fontSize
             }
-            dialog.show()0
+            numberPicker?.setOnValueChangedListener { _, _, newSize ->
+                board.fontSize = newSize
+            }
+            dialog.setOnDismissListener { binding.invalidateAll() }
+            dialog.show()
         }
 
     }

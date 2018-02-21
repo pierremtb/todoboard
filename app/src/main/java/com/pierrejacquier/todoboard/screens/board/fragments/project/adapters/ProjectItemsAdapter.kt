@@ -58,16 +58,19 @@ class ProjectItemsAdapter(var screenWidth: Int, private val fontSize: Int): Recy
             task = item
             dueTime = item.getDueDateTimeString()
 
+            val ctx = binding.root.context
+
             val indentWidth = (item.indent!! - 1) * CONTENT_LEFT_OFFSET
 
             textView.maxWidth =
                     if (dueTime.isNullOrEmpty())
-                        width - (indentWidth + 16*2 + 40).dp(binding.root.context)
+                        width - (indentWidth + 16*2 + 40).dp(ctx)
                     else
-                        width - (indentWidth + 16*2 + 40 + 13*8).dp(binding.root.context)
+                        width - (indentWidth + 16*2 + 40 + 13*8).dp(ctx)
 
-            indenter.layoutParams.width = indentWidth.dp(binding.root.context)
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
+            indenter.layoutParams.width = indentWidth.dp(ctx)
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
+            binding.root.layoutParams.height = fontSize + 10.dp(ctx)
             executePendingBindings()
         }
     }
