@@ -8,6 +8,7 @@ import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.*
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardProjectTaskItemBinding
+import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import kotlin.properties.Delegates
 
 
@@ -70,7 +71,8 @@ class ProjectItemsAdapter(var screenWidth: Int, private val fontSize: Int): Recy
 
             indenter.layoutParams.width = indentWidth.dp(ctx)
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
-            binding.root.layoutParams.height = fontSize + 10.dp(ctx)
+            taskDueDateTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (fontSize - 4).toFloat())
+            binding.root.layoutParams.height = (BoardActivity.ITEM_HEIGHT_SUP + fontSize).dp(root.context)
             executePendingBindings()
         }
     }

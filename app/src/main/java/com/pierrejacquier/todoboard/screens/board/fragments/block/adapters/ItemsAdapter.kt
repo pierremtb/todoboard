@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.dp
 import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
+import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.model.todoist.Item
 import com.pierrejacquier.todoboard.databinding.BoardTaskItemBinding
+import com.pierrejacquier.todoboard.screens.board.BoardActivity.Companion.ITEM_HEIGHT_SUP
 import kotlin.properties.Delegates
 
 
@@ -47,7 +49,8 @@ class ItemsAdapter(var screenWidth: Int, private val fontSize: Int): RecyclerVie
             dueTime = item.getDueTimeString()
             textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - 164 else screenWidth - 199
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
-            binding.root.layoutParams.height = fontSize + 20.dp(root.context)
+            textView4.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (fontSize - 4).toFloat())
+            binding.root.layoutParams.height = (ITEM_HEIGHT_SUP + fontSize).dp(root.context)
             executePendingBindings()
         }
     }

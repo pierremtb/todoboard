@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.support.annotation.MainThread
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.TodoboardApp
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
+import com.pierrejacquier.todoboard.commons.extensions.dp
 import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.database.AppDatabase
 import com.pierrejacquier.todoboard.data.model.todoist.Item
@@ -100,6 +102,9 @@ class ProjectBlockFragment : RxBaseFragment() {
 
             subscriptions.add(itemsSub)
         }
+
+        binding.type.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
+        binding.type.layoutParams.height = (fontSize + BoardActivity.TITLE_HEIGHT_SUP).dp(context!!)
 
         startAutoScrollTimer()
 

@@ -67,7 +67,7 @@ class BoardActivity : RxBaseActivity() {
         const val UNDATED_FRAGMENT = "undated"
 
         const val ITEM_HEIGHT_SUP = 10
-        const val TITLE_HEIGHT_SUP = 10
+        const val TITLE_HEIGHT_SUP = 8
         const val SPACING_HEIGHT = 2 * 8
 
         const val MINIMUM_DISPLAYED_ITEMS = 2
@@ -230,8 +230,8 @@ class BoardActivity : RxBaseActivity() {
                 val itemsSub = itemsManager.getItemsObservable(type)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { blockItems ->
-                            itemsCount = blockItems.size
+                        .subscribe {
+                            itemsCount = it.size
                             resetHeights()
                             checkHeights()
                         }

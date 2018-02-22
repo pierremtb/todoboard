@@ -6,14 +6,17 @@ import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.R
 import com.pierrejacquier.todoboard.commons.RxBaseFragment
+import com.pierrejacquier.todoboard.commons.extensions.dp
 import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.databinding.BoardFragmentItemsBlockBinding
 import com.pierrejacquier.todoboard.screens.board.BoardActivity
+import com.pierrejacquier.todoboard.screens.board.BoardActivity.Companion.TITLE_HEIGHT_SUP
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
 import com.pierrejacquier.todoboard.screens.board.fragments.block.adapters.ItemsAdapter
 import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItemsBlockFragmentComponent
@@ -115,6 +118,9 @@ class ItemsBlockFragment : RxBaseFragment() {
 
         subscriptions.add(itemsSub)
 
+        binding.type.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
+        binding.type.layoutParams.height = (fontSize + TITLE_HEIGHT_SUP).dp(context!!)
+
         startAutoScrollTimer()
     }
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -151,12 +157,12 @@ class ItemsBlockFragment : RxBaseFragment() {
                 if (itemsRV == null) return@runOnUiThread
 
                 if (itemsRV.computeVerticalScrollRange() > itemsRV.height) {
-                    with (itemsRV.layoutManager as LinearLayoutManager) {
+                    with (itemsRV.layoutManager as GridLayoutManager) {
                         var currentPos = findFirstVisibleItemPosition()
                         if (findLastVisibleItemPosition() == itemsAdapter.items.size - 1) {
                             currentPos = -1
                         }
-                        scrollToPositionWithOffset(currentPos + 1, 0)
+                        scrollToPositionWithOffset(currentPos + columns, 0)
                     }
                 }
             }
