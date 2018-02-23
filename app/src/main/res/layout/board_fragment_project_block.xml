@@ -28,26 +28,21 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Today" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/type">
+            tools:text="Project" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/itemsRV"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/type"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_height="0dp"
                 android:fadeScrollbars="false"
                 android:scrollbarStyle="outsideOverlay"
                 android:scrollbarThumbVertical="@color/white"
                 android:scrollbars="vertical"
                 tools:listitem="@layout/board_task_item" />
-        </ScrollView>
 
     </android.support.constraint.ConstraintLayout>
 
