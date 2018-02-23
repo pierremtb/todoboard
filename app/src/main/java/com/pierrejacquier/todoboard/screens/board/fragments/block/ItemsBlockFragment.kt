@@ -104,7 +104,11 @@ class ItemsBlockFragment : RxBaseFragment() {
         val size = Point()
         display?.getSize(size)
 
-        itemsAdapter = ItemsAdapter(getWidth() / columns, fontSize)
+        itemsAdapter = ItemsAdapter(
+                getWidth() / columns,
+                fontSize,
+                type == OVERDUE || type ==  LATER
+        )
 
         with (itemsRV) {
             layoutManager = GridLayoutManager(context, columns)

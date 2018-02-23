@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pierrejacquier.todoboard.commons.AutoUpdatableAdapter
 import com.pierrejacquier.todoboard.commons.extensions.dp
+import com.pierrejacquier.todoboard.commons.extensions.getDueDateTimeString
 import com.pierrejacquier.todoboard.commons.extensions.getDueTimeString
 import com.pierrejacquier.todoboard.commons.extensions.log
 import com.pierrejacquier.todoboard.data.model.todoist.Item
@@ -14,7 +15,7 @@ import com.pierrejacquier.todoboard.screens.board.BoardActivity.Companion.ITEM_H
 import kotlin.properties.Delegates
 
 
-class ItemsAdapter(var screenWidth: Int, private val fontSize: Int): RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
+class ItemsAdapter(var screenWidth: Int, private val fontSize: Int, private val fullDateDisplayed: Boolean): RecyclerView.Adapter<ItemsAdapter.ViewHolder>(), AutoUpdatableAdapter {
 
     init {
         setHasStableIds(true)
@@ -39,14 +40,14 @@ class ItemsAdapter(var screenWidth: Int, private val fontSize: Int): RecyclerVie
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], screenWidth, fontSize)
+        holder.bind(items[position], screenWidth, fontSize, fullDateDisplayed)
     }
 
     class ViewHolder(private val binding: BoardTaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Item, screenWidth: Int, fontSize: Int) = with(binding) {
+        fun bind(item: Item, screenWidth: Int, fontSize: Int, fullDateDisplayed: Boolean) = with(binding) {
             task = item
-            dueTime = item.getDueTimeString()
+            dueTime = if (fullDateDisplayed) item.getDueDateTimeString() else item.getDueTimeString()
             textView.maxWidth = if (dueTime.isNullOrEmpty()) screenWidth - 164 else screenWidth - 199
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
             textView4.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (fontSize - 4).toFloat())
