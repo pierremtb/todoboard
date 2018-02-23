@@ -295,15 +295,6 @@
                     android:text="@string/allow_for_multi_columns"
                     android:textSize="16sp" />
 
-                <!--<com.pierrejacquier.todoboard.commons.ListItemViewJava-->
-                    <!--android:id="@+id/userListItem"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--app:liv_displayMode="avatar"-->
-                    <!--app:liv_multiline="false"-->
-                    <!--bind:subtitle="@{user.email}"-->
-                    <!--bind:title="@{user.fullName}" />-->
-
                 <com.pierrejacquier.todoboard.commons.ListItemViewJava
                     android:id="@+id/fontSizeRow"
                     android:layout_width="match_parent"
@@ -312,6 +303,26 @@
                     bind:subtitle="@{board.getFontSizeString()}"
                     app:liv_multiline="false"
                     app:liv_displayMode="icon"/>
+
+                <Switch
+                    android:id="@+id/allowAutoScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/single_line_height"
+                    android:checked="@={board.allowForAutoScroll}"
+                    android:paddingEnd="@dimen/liv_padding_end"
+                    android:paddingStart="@dimen/liv_keyline"
+                    android:text="@string/allow_for_auto_scroll"
+                    android:textSize="16sp" />
+
+                <com.pierrejacquier.todoboard.commons.ListItemViewJava
+                    android:id="@+id/autoScrollDelayRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    bind:title="@{@string/auto_scroll_delay}"
+                    bind:subtitle="@{board.getAutoScrollDelayString()}"
+                    app:liv_multiline="false"
+                    app:liv_displayMode="icon"/>
+
             </LinearLayout>
         </ScrollView>
         

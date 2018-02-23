@@ -216,9 +216,8 @@ class BoardActivity : RxBaseActivity() {
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-
-                or View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
 
                 or View.SYSTEM_UI_FLAG_IMMERSIVE)
         window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
@@ -229,6 +228,7 @@ class BoardActivity : RxBaseActivity() {
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_VISIBLE
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
     }
 
@@ -304,9 +304,13 @@ class BoardActivity : RxBaseActivity() {
     private fun showItemsFragment(type: Int, layout: Int, tag: String) {
         val ft = supportFragmentManager.beginTransaction()
         val bundle = Bundle()
-        bundle.putInt(ItemsBlockFragment.KEY_TYPE, type)
-        bundle.putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
-        bundle.putBoolean(ItemsBlockFragment.KEY_MULTI_COLUMNS, board.allowForMultiColumns)
+        with (bundle) {
+            putInt(ItemsBlockFragment.KEY_TYPE, type)
+            putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
+            putBoolean(ItemsBlockFragment.KEY_MULTI_COLUMNS, board.allowForMultiColumns)
+            putBoolean(ItemsBlockFragment.KEY_ALLOW_FOR_AUTO_SCROLL, board.allowForAutoScroll)
+            putInt(ItemsBlockFragment.KEY_AUTO_SCROLL_DELAY, board.autoScrollDelay)
+        }
         val fragment = ItemsBlockFragment()
         fragment.arguments = bundle
         fragment.retainInstance = false
@@ -319,8 +323,12 @@ class BoardActivity : RxBaseActivity() {
             projectItemsLayout.visibility = View.VISIBLE
             val ft = supportFragmentManager.beginTransaction()
             val bundle = Bundle()
-            bundle.putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
-            bundle.putParcelable(ProjectBlockFragment.KEY_PROJECT_ID, projects[0])
+            with (bundle) {
+                putInt(ItemsBlockFragment.KEY_FONT_SIZE, board.fontSize)
+                putParcelable(ProjectBlockFragment.KEY_PROJECT_ID, projects[0])
+                putBoolean(ItemsBlockFragment.KEY_ALLOW_FOR_AUTO_SCROLL, board.allowForAutoScroll)
+                putInt(ItemsBlockFragment.KEY_AUTO_SCROLL_DELAY, board.autoScrollDelay)
+            }
             val fragment = ProjectBlockFragment()
             fragment.arguments = bundle
             ft.replace(R.id.projectItemsLayout, fragment, "project-view")

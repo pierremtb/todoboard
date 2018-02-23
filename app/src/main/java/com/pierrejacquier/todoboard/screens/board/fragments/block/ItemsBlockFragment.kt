@@ -20,6 +20,7 @@ import com.pierrejacquier.todoboard.screens.board.BoardActivity.Companion.TITLE_
 import com.pierrejacquier.todoboard.screens.board.ItemsManager
 import com.pierrejacquier.todoboard.screens.board.fragments.block.adapters.ItemsAdapter
 import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerItemsBlockFragmentComponent
+import com.pierrejacquier.todoboard.screens.details.BoardDetailsActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.board_fragment_items_block.*
@@ -34,6 +35,8 @@ class ItemsBlockFragment : RxBaseFragment() {
         const val KEY_TYPE = "type"
         const val KEY_MULTI_COLUMNS = "mcol"
         const val KEY_FONT_SIZE = "fs"
+        const val KEY_ALLOW_FOR_AUTO_SCROLL = "allow-auto-scroll"
+        const val KEY_AUTO_SCROLL_DELAY = "auto-scroll-delay"
 
         const val OVERDUE = 0
         const val TODAY = 1
@@ -41,8 +44,6 @@ class ItemsBlockFragment : RxBaseFragment() {
         const val LATER = 3
         const val UNDATED = 4
         const val PROJECT = 5
-
-        const val AUTOSCROLL_DELAY = 3
     }
 
     private lateinit var titles: Array<String>
@@ -63,6 +64,8 @@ class ItemsBlockFragment : RxBaseFragment() {
     private var allowForMultiColumns: Boolean = true
 
     private var fontSize: Int = 18
+    private var allowForAutoScroll = true
+    private var autoScrollDelay: Int = BoardDetailsActivity.DEFAULT_AUTO_SCROLL_DELAY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
@@ -85,6 +88,8 @@ class ItemsBlockFragment : RxBaseFragment() {
             type = it.getInt(KEY_TYPE)
             allowForMultiColumns = it.getBoolean(KEY_MULTI_COLUMNS)
             fontSize = it.getInt(KEY_FONT_SIZE)
+            allowForAutoScroll = it.getBoolean(KEY_ALLOW_FOR_AUTO_SCROLL)
+            autoScrollDelay = it.getInt(KEY_AUTO_SCROLL_DELAY)
         }
 
         super.onCreate(savedInstanceState)
@@ -125,7 +130,9 @@ class ItemsBlockFragment : RxBaseFragment() {
         binding.type.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
         binding.type.layoutParams.height = (fontSize + TITLE_HEIGHT_SUP).dp(context!!)
 
-        startAutoScrollTimer()
+        if (allowForAutoScroll) {
+            startAutoScrollTimer()
+        }
     }
     override fun onConfigurationChanged(newConfig: Configuration?) {
         columns = getColumnsCount()
@@ -151,7 +158,7 @@ class ItemsBlockFragment : RxBaseFragment() {
     }
 
     private fun startAutoScrollTimer() {
-        val delay = (1000 * AUTOSCROLL_DELAY).toLong()
+        val delay = (1000 * autoScrollDelay).toLong()
         autoScrollTimer = fixedRateTimer(
                 name = "scroll-timer",
                 initialDelay = delay,
@@ -175,6 +182,8 @@ class ItemsBlockFragment : RxBaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        autoScrollTimer.cancel()
+        if (this::autoScrollTimer.isInitialized) {
+            autoScrollTimer.cancel()
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.pierrejacquier.todoboard.data.model
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import com.pierrejacquier.todoboard.screens.board.BoardActivity
 import com.pierrejacquier.todoboard.screens.details.BoardDetailsActivity
 import paperparcel.PaperParcel
 import paperparcel.PaperParcelable
@@ -24,7 +25,9 @@ data class Board(
     var projectViewEnabled: Boolean = false,
     var order: Int = 0,
     var allowForMultiColumns: Boolean = true,
-    var fontSize: Int = BoardDetailsActivity.DEFAULT_FONT_SIZE
+    var fontSize: Int = BoardDetailsActivity.DEFAULT_FONT_SIZE,
+    var allowForAutoScroll: Boolean = true,
+    var autoScrollDelay: Int = BoardDetailsActivity.DEFAULT_AUTO_SCROLL_DELAY
 
 ): PaperParcelable {
     companion object {
@@ -32,4 +35,6 @@ data class Board(
     }
 
     fun getFontSizeString() = fontSize.toString()
+
+    fun getAutoScrollDelayString() = "${autoScrollDelay.toString()} sec"
 }

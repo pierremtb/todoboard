@@ -228,4 +228,6 @@
     <string name="display_settings">Display settings</string>
     <string name="allow_for_multi_columns">Allow for multi columns (on timeslots view)</string>
     <string name="font_size">Font size</string>
+    <string name="allow_for_auto_scroll">Enable auto-scroll</string>
+    <string name="auto_scroll_delay">Auto-scroll delay</string>
 </resources>

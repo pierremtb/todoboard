@@ -30,6 +30,7 @@ import com.pierrejacquier.todoboard.screens.board.fragments.block.di.DaggerProje
 import com.pierrejacquier.todoboard.screens.board.fragments.header.HeaderFragment.Companion.KEY_USER
 import com.pierrejacquier.todoboard.screens.board.fragments.header.di.DaggerHeaderFragmentComponent
 import com.pierrejacquier.todoboard.screens.board.fragments.project.adapters.ProjectItemsAdapter
+import com.pierrejacquier.todoboard.screens.details.BoardDetailsActivity
 import e
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -60,6 +61,8 @@ class ProjectBlockFragment : RxBaseFragment() {
     private lateinit var autoScrollTimer: Timer
 
     private var fontSize: Int = 18
+    private var allowForAutoScroll = true
+    private var autoScrollDelay: Int = BoardDetailsActivity.DEFAULT_AUTO_SCROLL_DELAY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         retainInstance = true
@@ -71,6 +74,8 @@ class ProjectBlockFragment : RxBaseFragment() {
         arguments?.let {
             project = it.getParcelable(KEY_PROJECT_ID)
             fontSize = it.getInt(ItemsBlockFragment.KEY_FONT_SIZE)
+            allowForAutoScroll = it.getBoolean(ItemsBlockFragment.KEY_ALLOW_FOR_AUTO_SCROLL)
+            autoScrollDelay = it.getInt(ItemsBlockFragment.KEY_AUTO_SCROLL_DELAY)
         }
 
         super.onCreate(savedInstanceState)
@@ -106,7 +111,9 @@ class ProjectBlockFragment : RxBaseFragment() {
         binding.type.setTextSize(TypedValue.COMPLEX_UNIT_DIP, fontSize.toFloat())
         binding.type.layoutParams.height = (fontSize + BoardActivity.TITLE_HEIGHT_SUP).dp(context!!)
 
-        startAutoScrollTimer()
+        if (allowForAutoScroll) {
+            startAutoScrollTimer()
+        }
 
     }
 
@@ -125,7 +132,7 @@ class ProjectBlockFragment : RxBaseFragment() {
     }
 
     private fun startAutoScrollTimer() {
-        val delay = (1000 * ItemsBlockFragment.AUTOSCROLL_DELAY).toLong()
+        val delay = (1000 * autoScrollDelay).toLong()
         autoScrollTimer = fixedRateTimer(
                 name = "scroll-timer",
                 initialDelay = delay,
@@ -147,7 +154,9 @@ class ProjectBlockFragment : RxBaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        autoScrollTimer.cancel()
+        if (this::autoScrollTimer.isInitialized) {
+            autoScrollTimer.cancel()
+        }
     }
 
 }

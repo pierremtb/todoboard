@@ -58,7 +58,10 @@ class BoardDetailsActivity : RxBaseActivity() {
     companion object {
         const val MIN_FONT_SIZE = 8
         const val MAX_FONT_SIZE = 26
-        const val DEFAULT_FONT_SIZE = 18
+        const val DEFAULT_FONT_SIZE = 16
+        const val MIN_AUTO_SCROLL_DELAY = 1
+        const val MAX_AUTO_SCROLL_DELAY = 300
+        const val DEFAULT_AUTO_SCROLL_DELAY = 16
     }
 
     private lateinit var board: Board
@@ -147,29 +150,7 @@ class BoardDetailsActivity : RxBaseActivity() {
             adapter = SelectableProjectsAdapter()
         }
 
-        val context = this
-
-        manageProjectsButton.setOnClickListener { projectsDialog.show() }
-
-        fontSizeRow.setOnClickListener {
-            val dialog = MaterialDialog.Builder(context)
-                    .title(R.string.font_size)
-                    .customView(R.layout.dialog_font_size_picker, false)
-                    .positiveText(R.string.done)
-                    .build()
-            val numberPicker = dialog.customView?.findViewById<NumberPicker>(R.id.numberPicker)
-            numberPicker?.let {
-                it.minValue = MIN_FONT_SIZE
-                it.maxValue = MAX_FONT_SIZE
-                it.value = board.fontSize
-            }
-            numberPicker?.setOnValueChangedListener { _, _, newSize ->
-                board.fontSize = newSize
-            }
-            dialog.setOnDismissListener { binding.invalidateAll() }
-            dialog.show()
-        }
-
+        setClickListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -294,5 +275,49 @@ class BoardDetailsActivity : RxBaseActivity() {
                     dialog.hide()
                 })
         subscriptions.add(syncSub)
+    }
+
+    private fun setClickListeners() {
+        val context = this
+
+        manageProjectsButton.setOnClickListener { projectsDialog.show() }
+
+        fontSizeRow.setOnClickListener {
+            val dialog = MaterialDialog.Builder(context)
+                    .title(R.string.font_size)
+                    .customView(R.layout.dialog_font_size_picker, false)
+                    .positiveText(R.string.done)
+                    .build()
+            val numberPicker = dialog.customView?.findViewById<NumberPicker>(R.id.numberPicker)
+            numberPicker?.let {
+                it.minValue = MIN_FONT_SIZE
+                it.maxValue = MAX_FONT_SIZE
+                it.value = board.fontSize
+            }
+            numberPicker?.setOnValueChangedListener { _, _, newSize ->
+                board.fontSize = newSize
+            }
+            dialog.setOnDismissListener { binding.invalidateAll() }
+            dialog.show()
+        }
+
+        autoScrollDelayRow.setOnClickListener {
+            val dialog = MaterialDialog.Builder(context)
+                    .title(R.string.auto_scroll_delay)
+                    .customView(R.layout.dialog_auto_scroll_delay_picker, false)
+                    .positiveText(R.string.done)
+                    .build()
+            val numberPicker = dialog.customView?.findViewById<NumberPicker>(R.id.autoScrollDelayPicker)
+            numberPicker?.let {
+                it.minValue = MIN_AUTO_SCROLL_DELAY
+                it.maxValue = MAX_AUTO_SCROLL_DELAY
+                it.value = board.autoScrollDelay
+            }
+            numberPicker?.setOnValueChangedListener { _, _, newDelay ->
+                board.autoScrollDelay = newDelay
+            }
+            dialog.setOnDismissListener { binding.invalidateAll() }
+            dialog.show()
+        }
     }
 }
