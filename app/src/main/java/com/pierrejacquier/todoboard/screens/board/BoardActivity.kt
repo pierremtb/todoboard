@@ -116,6 +116,9 @@ class BoardActivity : RxBaseActivity() {
 
         headerLayout.setOnClickListener {
             showSystemUI()
+            if (context.packageManager.hasSystemFeature(PackageManager.FEATURE_PC)) {
+                popToolbar()
+            }
         }
 
         window.decorView.setOnSystemUiVisibilityChangeListener {
