@@ -1,5 +1,3 @@
-# todoboard
-
 ![Icon](./app/src/main/res/mipmap-mdpi/ic_launcher.png) Todoboard
 =========
 An Android app to display your Todoist tasks non-intrusively.
