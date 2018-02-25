@@ -40,6 +40,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 import com.afollestad.materialdialogs.MaterialDialog
+import com.crashlytics.android.Crashlytics
 import java.util.concurrent.TimeUnit
 
 
@@ -103,7 +104,6 @@ class BoardActivity : RxBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         component = DaggerBoardActivityComponent.builder()
                 .todoboardAppComponent(TodoboardApp.withActivity(this).component)
                 .build()

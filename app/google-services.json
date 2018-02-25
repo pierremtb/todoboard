@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "277673878234",
+    "firebase_url": "https://todoboard-9d5e0.firebaseio.com",
+    "project_id": "todoboard-9d5e0",
+    "storage_bucket": "todoboard-9d5e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:277673878234:android:f5ad8bff0449d384",
+        "android_client_info": {
+          "package_name": "com.pierrejacquier.todoboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "277673878234-32hgj8c6rn2sjq48anjp887vjtpossds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pierrejacquier.todoboard",
+            "certificate_hash": "3cbcefff9b08d82602a9313196c4e30c249052c1"
+          }
+        },
+        {
+          "client_id": "277673878234-pbgvnve6gc6jqvp85l1bfipd23pv5ru0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfqLSPsQPZi4dF9PLE_LRlqRekB_lo6e8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "277673878234-pbgvnve6gc6jqvp85l1bfipd23pv5ru0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
