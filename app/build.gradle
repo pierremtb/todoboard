@@ -15,6 +15,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -26,6 +27,8 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.2'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Todoist Pojos

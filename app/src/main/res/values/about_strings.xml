@@ -2,5 +2,5 @@
 <resources>
     <string name="aboutLibraries_description_showIcon">true</string>
     <string name="aboutLibraries_description_showVersion">true</string>
-    <string name="aboutLibraries_description_text">Open source application, created by Pierre Jacquier</string>
+    <string name="aboutLibraries_description_text">Open source application, created by Pierre Jacquier (@pierremtb). Code and issue tracker available at https://github.com/pierremtb/todoboard</string>
 </resources>
